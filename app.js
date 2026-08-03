@@ -57,7 +57,7 @@ let state = {
         currentCount: 0,
         currentType: 'subhanallah',
         dailyTarget: 100,
-        todayTotal: 87,
+        todayTotal: 0,
         sessions: []
     },
     quran: {
@@ -116,10 +116,10 @@ let state = {
 
 const Store = {
     save() {
-        localStorage.setItem('muslimLifeOS_state_v4_clean', JSON.stringify(state));
+        localStorage.setItem('muslimLifeOS_state_v5_clean', JSON.stringify(state));
     },
     load() {
-        const saved = localStorage.getItem('muslimLifeOS_state_v4_clean') || localStorage.getItem('muslimLifeOS_state');
+        const saved = localStorage.getItem('muslimLifeOS_state_v5_clean') || localStorage.getItem('muslimLifeOS_state');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -151,7 +151,7 @@ const Store = {
         }
     },
     resetDemo() {
-        localStorage.removeItem('muslimLifeOS_state_v4_clean');
+        localStorage.removeItem('muslimLifeOS_state_v5_clean');
         localStorage.removeItem('muslimLifeOS_state');
         location.reload();
     }
@@ -1915,7 +1915,7 @@ function renderStatsCharts() {
                 labels: ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'],
                 datasets: [{
                     label: 'Ibadah Score',
-                    data: [92, 78, 95, 88, 100, 85, 70],
+                    data: [0, 0, 0, 0, 0, 0, 0],
                     backgroundColor: '#10b981',
                     borderRadius: 8
                 }]
@@ -1942,7 +1942,7 @@ function renderStatsCharts() {
                 labels: ['Solat', 'Quran', 'Zikir', 'Puasa', 'Sedekah', 'Muhasabah'],
                 datasets: [{
                     label: 'Current',
-                    data: [92, 65, 87, 40, 55, 78],
+                    data: [0, 0, 0, 0, 0, 0],
                     borderColor: '#34d399',
                     backgroundColor: 'rgba(52, 211, 153, 0.15)',
                     pointBackgroundColor: '#34d399'
