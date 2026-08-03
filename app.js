@@ -2869,4 +2869,16 @@ window.refreshFamilyReport = refreshFamilyReport;
 window.enableNotifications = enableNotifications;
 window.testNotification = testNotification;
 
+
+async function mlosProfileSignOut() {
+    try {
+        if (window.MLOS_SB && MLOS_SB.isLoggedIn()) {
+            await MLOS_SB.signOut();
+        }
+    } catch (e) {}
+    hideProfileModal();
+    showToast('Log keluar berjaya', 'success');
+    if (typeof refreshAuthUI === 'function') refreshAuthUI();
+}
+window.mlosProfileSignOut = mlosProfileSignOut;
 window.MLOS = { state, Store, showModule, celebrate, unlockAchievement };
