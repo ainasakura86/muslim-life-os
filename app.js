@@ -645,26 +645,45 @@ function markAllPrayersToday() {
 function renderPrayerHeatmap() {
     const container = document.getElementById('prayer-heatmap');
     if (!container) return;
-    
     container.innerHTML = '';
-    
+
+    // Build map date -> count from real history only
+    const byDate = {};
+    (state.solat.history || []).forEach(h => {
+        const d = (h.date || '').slice(0, 10);
+        if (!d) return;
+        byDate[d] = (byDate[d] || 0) + 1;
+    });
+    // Also count today's marked prayers
+    const today = new Date().toISOString().slice(0, 10);
+    const todayCount = Object.values(state.solat.today || {}).filter(p => p && p.status).length;
+    if (todayCount) byDate[today] = Math.max(byDate[today] || 0, todayCount);
+
+    let daysWithData = 0;
+    let totalPossible = 0;
+    const colors = ['#1e2937', '#14532d', '#166534', '#15803d', '#4ade80'];
+
     for (let i = 29; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
-        
-        // More realistic completion based on streak
-        const base = state.user.streak > 30 ? 0.85 : 0.7;
-        const completion = Math.random() < base ? Math.floor(Math.random() * 2) + 4 : Math.floor(Math.random() * 3) + 1;
-        const intensity = Math.min(4, Math.floor(completion / 1.25));
-        
-        const colors = ['#1e2937', '#14532d', '#166534', '#15803d', '#4ade80'];
-        
+        const key = date.toISOString().slice(0, 10);
+        const completion = byDate[key] || 0;
+        if (completion > 0) daysWithData++;
+        totalPossible++;
+        const intensity = completion <= 0 ? 0 : Math.min(4, completion);
         const cell = document.createElement('div');
         cell.className = 'heatmap-cell';
         cell.style.backgroundColor = colors[intensity];
-        cell.title = `${date.toLocaleDateString('ms-MY')} — ${completion}/5 solat`;
-        
+        cell.title = date.toLocaleDateString('ms-MY') + ' — ' + completion + '/5 solat';
         container.appendChild(cell);
+    }
+
+    const cons = document.getElementById('heatmap-consistency');
+    if (cons) {
+        // Only count consistency from days that have any log; if none, 0%
+        const loggedDays = Object.keys(byDate).length;
+        const pct = loggedDays === 0 ? 0 : Math.round((Object.values(byDate).reduce((a,b)=>a+b,0) / (loggedDays * 5)) * 100);
+        cons.textContent = pct + '% consistency';
     }
 }
 
