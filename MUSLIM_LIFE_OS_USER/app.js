@@ -57,7 +57,7 @@ let state = {
         currentCount: 0,
         currentType: 'subhanallah',
         dailyTarget: 100,
-        todayTotal: 0,
+        todayTotal: 87,
         sessions: []
     },
     quran: {
@@ -69,7 +69,7 @@ let state = {
     },
     hafazan: [], // {surah, start, end, level, updated}
     tajwid: {
-        ikhfa: 0, idgham: 0, iqlab: 0, izhar: 0, qalqalah: 0, mad: 0, other: 0
+        ikhfa: 40, idgham: 30, iqlab: 20, izhar: 50, qalqalah: 60, mad: 35, other: 10
     },
     tahriri: [], // {score, mistakes, notes, date}
     selawat: {
@@ -116,10 +116,10 @@ let state = {
 
 const Store = {
     save() {
-        localStorage.setItem('muslimLifeOS_state_v5_clean', JSON.stringify(state));
+        localStorage.setItem('muslimLifeOS_state_v2_user', JSON.stringify(state));
     },
     load() {
-        const saved = localStorage.getItem('muslimLifeOS_state_v5_clean') || localStorage.getItem('muslimLifeOS_state');
+        const saved = localStorage.getItem('muslimLifeOS_state_v2_user') || localStorage.getItem('muslimLifeOS_state');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -151,7 +151,7 @@ const Store = {
         }
     },
     resetDemo() {
-        localStorage.removeItem('muslimLifeOS_state_v5_clean');
+        localStorage.removeItem('muslimLifeOS_state_v2_user');
         localStorage.removeItem('muslimLifeOS_state');
         location.reload();
     }
@@ -269,11 +269,6 @@ function toggleTheme() {
 
 // -------------------- NAVIGATION --------------------
 function showModule(module) {
-    if (isAuthRequired() && !(window.MLOS_SB && MLOS_SB.isLoggedIn())) {
-        updateLoginGate();
-        return;
-    }
-
     document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
     
     const target = document.getElementById(`view-${module}`);
@@ -650,45 +645,26 @@ function markAllPrayersToday() {
 function renderPrayerHeatmap() {
     const container = document.getElementById('prayer-heatmap');
     if (!container) return;
+    
     container.innerHTML = '';
-
-    // Build map date -> count from real history only
-    const byDate = {};
-    (state.solat.history || []).forEach(h => {
-        const d = (h.date || '').slice(0, 10);
-        if (!d) return;
-        byDate[d] = (byDate[d] || 0) + 1;
-    });
-    // Also count today's marked prayers
-    const today = new Date().toISOString().slice(0, 10);
-    const todayCount = Object.values(state.solat.today || {}).filter(p => p && p.status).length;
-    if (todayCount) byDate[today] = Math.max(byDate[today] || 0, todayCount);
-
-    let daysWithData = 0;
-    let totalPossible = 0;
-    const colors = ['#1e2937', '#14532d', '#166534', '#15803d', '#4ade80'];
-
+    
     for (let i = 29; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
-        const key = date.toISOString().slice(0, 10);
-        const completion = byDate[key] || 0;
-        if (completion > 0) daysWithData++;
-        totalPossible++;
-        const intensity = completion <= 0 ? 0 : Math.min(4, completion);
+        
+        // More realistic completion based on streak
+        const base = state.user.streak > 30 ? 0.85 : 0.7;
+        const completion = Math.random() < base ? Math.floor(Math.random() * 2) + 4 : Math.floor(Math.random() * 3) + 1;
+        const intensity = Math.min(4, Math.floor(completion / 1.25));
+        
+        const colors = ['#1e2937', '#14532d', '#166534', '#15803d', '#4ade80'];
+        
         const cell = document.createElement('div');
         cell.className = 'heatmap-cell';
         cell.style.backgroundColor = colors[intensity];
-        cell.title = date.toLocaleDateString('ms-MY') + ' — ' + completion + '/5 solat';
+        cell.title = `${date.toLocaleDateString('ms-MY')} — ${completion}/5 solat`;
+        
         container.appendChild(cell);
-    }
-
-    const cons = document.getElementById('heatmap-consistency');
-    if (cons) {
-        // Only count consistency from days that have any log; if none, 0%
-        const loggedDays = Object.keys(byDate).length;
-        const pct = loggedDays === 0 ? 0 : Math.round((Object.values(byDate).reduce((a,b)=>a+b,0) / (loggedDays * 5)) * 100);
-        cons.textContent = pct + '% consistency';
     }
 }
 
@@ -1831,22 +1807,9 @@ function updateDashboardStats() {
     
     const ibadahEl = document.getElementById('ibadah-score');
     if (ibadahEl) {
-        // Real score from 0: solat (max 50) + quran pages (max 25) + zikir (max 25)
-        const solatDone = Object.values(state.solat.today || {}).filter(p => p && p.status).length;
-        const solatPts = Math.round((solatDone / 5) * 50);
-        const quranPts = Math.min(25, Math.round(((state.quran?.todayPages || 0) / Math.max(1, state.quran?.dailyTargetPages || 5)) * 25));
-        const zikirPts = Math.min(25, Math.round(((state.zikir?.todayTotal || 0) / Math.max(1, state.zikir?.dailyTarget || 100)) * 25));
-        const score = Math.min(100, solatPts + quranPts + zikirPts);
+        const completed = Object.values(state.solat.today).filter(p => p.status).length;
+        const score = Math.min(100, 70 + completed * 5 + Math.floor(state.user.streak / 5));
         ibadahEl.textContent = score;
-        const bar = ibadahEl.parentElement?.parentElement?.querySelector('.bg-emerald-500');
-        if (bar) bar.style.width = score + '%';
-    }
-    const lifeEl = document.getElementById('life-balance');
-    if (lifeEl) {
-        const solatDone = Object.values(state.solat.today || {}).filter(p => p && p.status).length;
-        const q = Math.min(100, Math.round(((state.quran?.todayPages || 0) / 5) * 100));
-        const s = Math.round((solatDone / 5) * 100);
-        lifeEl.textContent = Math.round((s + q) / 2);
     }
     
     const recentContainer = document.getElementById('recent-activities');
@@ -1920,7 +1883,7 @@ function renderStatsCharts() {
                 labels: ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'],
                 datasets: [{
                     label: 'Ibadah Score',
-                    data: [0, 0, 0, 0, 0, 0, 0],
+                    data: [92, 78, 95, 88, 100, 85, 70],
                     backgroundColor: '#10b981',
                     borderRadius: 8
                 }]
@@ -1947,7 +1910,7 @@ function renderStatsCharts() {
                 labels: ['Solat', 'Quran', 'Zikir', 'Puasa', 'Sedekah', 'Muhasabah'],
                 datasets: [{
                     label: 'Current',
-                    data: [0, 0, 0, 0, 0, 0],
+                    data: [92, 65, 87, 40, 55, 78],
                     borderColor: '#34d399',
                     backgroundColor: 'rgba(52, 211, 153, 0.15)',
                     pointBackgroundColor: '#34d399'
@@ -2081,14 +2044,12 @@ function initializeApp() {
     }
     
     console.log('%c[MUSLIM LIFE OS™] Ready. Offline-first • Premium Islamic UX', 'color:#166534');
-    setTimeout(() => { updateLoginGate(); checkAuthRecovery(); }, 500);
     if (localStorage.getItem('mlos_notif') === '1' && typeof schedulePrayerNotifications === 'function') {
         setTimeout(schedulePrayerNotifications, 2000);
     }
     if (window.MLOS_SB) {
         MLOS_SB.init().then(() => {
             refreshAuthUI();
-            updateLoginGate();
             console.log('%c[Supabase] Auth ready', 'color:#166534');
         }).catch(e => console.warn('Supabase init', e));
     }
@@ -2907,210 +2868,5 @@ window.setReportRange = setReportRange;
 window.refreshFamilyReport = refreshFamilyReport;
 window.enableNotifications = enableNotifications;
 window.testNotification = testNotification;
-
-
-async function mlosProfileSignOut() {
-    try {
-        if (window.MLOS_SB && MLOS_SB.isLoggedIn()) {
-            await MLOS_SB.signOut();
-        }
-    } catch (e) {}
-    hideProfileModal();
-    showToast('Log keluar berjaya', 'success');
-    if (typeof refreshAuthUI === 'function') refreshAuthUI();
-    updateLoginGate();
-}
-window.mlosProfileSignOut = mlosProfileSignOut;
-
-// -------------------- LOGIN GATE --------------------
-function isAuthRequired() {
-    return true; // set false to allow guest mode
-}
-
-function updateLoginGate() {
-    const gate = document.getElementById('login-gate');
-    if (!gate) return;
-    const logged = window.MLOS_SB && MLOS_SB.isLoggedIn();
-    if (isAuthRequired() && !logged) {
-        gate.classList.remove('hidden');
-        gate.style.display = 'flex';
-    } else {
-        gate.classList.add('hidden');
-        gate.style.display = 'none';
-    }
-}
-
-async function gateSignUp() {
-    const name = document.getElementById('gate-name')?.value?.trim();
-    const email = document.getElementById('gate-email')?.value?.trim();
-    const password = document.getElementById('gate-password')?.value || '';
-    const msg = document.getElementById('gate-msg');
-    if (!email || password.length < 6) {
-        if (msg) msg.textContent = 'Email & password (min 6) diperlukan';
-        return;
-    }
-    if (!window.MLOS_SB) {
-        if (msg) msg.textContent = 'Supabase belum ready';
-        return;
-    }
-    if (msg) msg.textContent = 'Mendaftar...';
-    const res = await MLOS_SB.signUp(email, password, name);
-    if (res.error) {
-        if (msg) msg.textContent = res.error;
-        return;
-    }
-    // try auto sign-in
-    const login = await MLOS_SB.signIn(email, password);
-    if (login.error) {
-        if (msg) msg.textContent = 'Daftar berjaya. Sila Log Masuk.';
-        return;
-    }
-    if (name && state.user) {
-        state.user.name = name;
-        if (typeof Store !== 'undefined') Store.save(state);
-        if (typeof updateHeaderProfile === 'function') updateHeaderProfile();
-    }
-    if (msg) msg.textContent = 'Berjaya!';
-    updateLoginGate();
-    if (typeof refreshAuthUI === 'function') refreshAuthUI();
-    showToast('Selamat datang!', 'success');
-}
-
-async function gateSignIn() {
-    const email = document.getElementById('gate-email')?.value?.trim();
-    const password = document.getElementById('gate-password')?.value || '';
-    const msg = document.getElementById('gate-msg');
-    if (!email || !password) {
-        if (msg) msg.textContent = 'Isi email & password';
-        return;
-    }
-    if (!window.MLOS_SB) {
-        if (msg) msg.textContent = 'Supabase belum ready';
-        return;
-    }
-    if (msg) msg.textContent = 'Log masuk...';
-    const res = await MLOS_SB.signIn(email, password);
-    if (res.error) {
-        if (msg) msg.textContent = res.error;
-        return;
-    }
-    const u = MLOS_SB.getUser();
-    if (u && state.user) {
-        state.user.name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'Pengguna';
-        if (typeof Store !== 'undefined') Store.save(state);
-        if (typeof updateHeaderProfile === 'function') updateHeaderProfile();
-    }
-    if (msg) msg.textContent = '';
-    updateLoginGate();
-    if (typeof refreshAuthUI === 'function') refreshAuthUI();
-    showToast('Log masuk berjaya', 'success');
-}
-
-window.gateSignUp = gateSignUp;
-window.gateSignIn = gateSignIn;
-
-function showForgotForm() {
-    document.getElementById('gate-form-main')?.classList.add('hidden');
-    document.getElementById('gate-form-forgot')?.classList.remove('hidden');
-    document.getElementById('gate-form-newpass')?.classList.add('hidden');
-    const t = document.getElementById('gate-title');
-    if (t) t.textContent = 'Lupa Password';
-    const m = document.getElementById('gate-msg');
-    if (m) m.textContent = '';
-}
-
-function showMainAuthForm() {
-    document.getElementById('gate-form-main')?.classList.remove('hidden');
-    document.getElementById('gate-form-forgot')?.classList.add('hidden');
-    document.getElementById('gate-form-newpass')?.classList.add('hidden');
-    const t = document.getElementById('gate-title');
-    if (t) t.textContent = 'Log Masuk / Daftar';
-    const m = document.getElementById('gate-msg');
-    if (m) m.textContent = '';
-}
-
-function showNewPassForm() {
-    document.getElementById('gate-form-main')?.classList.add('hidden');
-    document.getElementById('gate-form-forgot')?.classList.add('hidden');
-    document.getElementById('gate-form-newpass')?.classList.remove('hidden');
-    const t = document.getElementById('gate-title');
-    if (t) t.textContent = 'Password Baharu';
-}
-
-async function gateForgotPassword() {
-    const email = document.getElementById('gate-forgot-email')?.value?.trim()
-        || document.getElementById('gate-email')?.value?.trim();
-    const msg = document.getElementById('gate-msg');
-    if (!email) {
-        if (msg) msg.textContent = 'Masukkan email';
-        return;
-    }
-    if (!window.MLOS_SB) return;
-    if (msg) msg.textContent = 'Menghantar...';
-    const res = await MLOS_SB.resetPassword(email);
-    if (res.error) {
-        if (msg) msg.textContent = res.error;
-        return;
-    }
-    if (msg) msg.textContent = res.message || 'Semak email untuk link reset.';
-    showToast('Email reset dihantar', 'success');
-}
-
-async function gateUpdatePassword() {
-    const p1 = document.getElementById('gate-new-password')?.value || '';
-    const p2 = document.getElementById('gate-new-password2')?.value || '';
-    const msg = document.getElementById('gate-msg');
-    if (p1.length < 6) {
-        if (msg) msg.textContent = 'Password min 6 aksara';
-        return;
-    }
-    if (p1 !== p2) {
-        if (msg) msg.textContent = 'Password tidak sama';
-        return;
-    }
-    const res = await MLOS_SB.updatePassword(p1);
-    if (res.error) {
-        if (msg) msg.textContent = res.error;
-        return;
-    }
-    if (msg) msg.textContent = 'Password dikemaskini. Sila log masuk.';
-    showToast('Password berjaya ditukar', 'success');
-    showMainAuthForm();
-}
-
-async function gateGoogle() {
-    const msg = document.getElementById('gate-msg');
-    if (!window.MLOS_SB) {
-        if (msg) msg.textContent = 'Supabase belum ready';
-        return;
-    }
-    if (msg) msg.textContent = 'Membuka Google...';
-    const res = await MLOS_SB.signInWithGoogle();
-    if (res.error) {
-        if (msg) msg.textContent = res.error + ' — Aktifkan Google di Supabase Auth Providers.';
-    }
-}
-
-// Detect password recovery session from URL
-async function checkAuthRecovery() {
-    if (!window.MLOS_SB) return;
-    const hash = window.location.hash || '';
-    if (hash.includes('type=recovery') || hash.includes('type=signup')) {
-        showNewPassForm();
-        const gate = document.getElementById('login-gate');
-        if (gate) {
-            gate.classList.remove('hidden');
-            gate.style.display = 'flex';
-        }
-    }
-}
-
-window.showForgotForm = showForgotForm;
-window.showMainAuthForm = showMainAuthForm;
-window.gateForgotPassword = gateForgotPassword;
-window.gateUpdatePassword = gateUpdatePassword;
-window.gateGoogle = gateGoogle;
-
-window.updateLoginGate = updateLoginGate;
 
 window.MLOS = { state, Store, showModule, celebrate, unlockAchievement };

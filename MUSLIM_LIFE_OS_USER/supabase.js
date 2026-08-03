@@ -82,38 +82,6 @@ async function signOut() {
     currentSession = null;
 }
 
-async function resetPassword(email) {
-    const client = getSupabase();
-    if (!client) return { error: 'Supabase tidak tersedia' };
-    const redirectTo = window.location.origin + window.location.pathname;
-    const { data, error } = await client.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: redirectTo
-    });
-    if (error) return { error: error.message };
-    return { data, message: 'Email reset dihantar. Semak inbox / spam.' };
-}
-
-async function updatePassword(newPassword) {
-    const client = getSupabase();
-    if (!client) return { error: 'Supabase tidak tersedia' };
-    const { data, error } = await client.auth.updateUser({ password: newPassword });
-    if (error) return { error: error.message };
-    return { data };
-}
-
-async function signInWithGoogle() {
-    const client = getSupabase();
-    if (!client) return { error: 'Supabase tidak tersedia' };
-    const redirectTo = window.location.origin + window.location.pathname;
-    const { data, error } = await client.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo }
-    });
-    if (error) return { error: error.message };
-    return { data };
-}
-
-
 function generateFamilyCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = 'ML-';
@@ -257,9 +225,6 @@ window.MLOS_SB = {
     signUp,
     signIn,
     signOut,
-    resetPassword,
-    updatePassword,
-    signInWithGoogle,
     createFamily,
     joinFamily,
     getMyFamily,
