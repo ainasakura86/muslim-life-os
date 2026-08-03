@@ -1807,9 +1807,22 @@ function updateDashboardStats() {
     
     const ibadahEl = document.getElementById('ibadah-score');
     if (ibadahEl) {
-        const completed = Object.values(state.solat.today).filter(p => p.status).length;
-        const score = Math.min(100, 70 + completed * 5 + Math.floor(state.user.streak / 5));
+        // Real score from 0: solat (max 50) + quran pages (max 25) + zikir (max 25)
+        const solatDone = Object.values(state.solat.today || {}).filter(p => p && p.status).length;
+        const solatPts = Math.round((solatDone / 5) * 50);
+        const quranPts = Math.min(25, Math.round(((state.quran?.todayPages || 0) / Math.max(1, state.quran?.dailyTargetPages || 5)) * 25));
+        const zikirPts = Math.min(25, Math.round(((state.zikir?.todayTotal || 0) / Math.max(1, state.zikir?.dailyTarget || 100)) * 25));
+        const score = Math.min(100, solatPts + quranPts + zikirPts);
         ibadahEl.textContent = score;
+        const bar = ibadahEl.parentElement?.parentElement?.querySelector('.bg-emerald-500');
+        if (bar) bar.style.width = score + '%';
+    }
+    const lifeEl = document.getElementById('life-balance');
+    if (lifeEl) {
+        const solatDone = Object.values(state.solat.today || {}).filter(p => p && p.status).length;
+        const q = Math.min(100, Math.round(((state.quran?.todayPages || 0) / 5) * 100));
+        const s = Math.round((solatDone / 5) * 100);
+        lifeEl.textContent = Math.round((s + q) / 2);
     }
     
     const recentContainer = document.getElementById('recent-activities');
