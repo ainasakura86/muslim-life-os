@@ -116,10 +116,10 @@ let state = {
 
 const Store = {
     save() {
-        localStorage.setItem('muslimLifeOS_state_v3_clean', JSON.stringify(state));
+        localStorage.setItem('muslimLifeOS_state_v4_clean', JSON.stringify(state));
     },
     load() {
-        const saved = localStorage.getItem('muslimLifeOS_state_v3_clean') || localStorage.getItem('muslimLifeOS_state');
+        const saved = localStorage.getItem('muslimLifeOS_state_v4_clean') || localStorage.getItem('muslimLifeOS_state');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -151,7 +151,7 @@ const Store = {
         }
     },
     resetDemo() {
-        localStorage.removeItem('muslimLifeOS_state_v3_clean');
+        localStorage.removeItem('muslimLifeOS_state_v4_clean');
         localStorage.removeItem('muslimLifeOS_state');
         location.reload();
     }
