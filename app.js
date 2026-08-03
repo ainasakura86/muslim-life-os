@@ -269,6 +269,11 @@ function toggleTheme() {
 
 // -------------------- NAVIGATION --------------------
 function showModule(module) {
+    if (isAuthRequired() && !(window.MLOS_SB && MLOS_SB.isLoggedIn())) {
+        updateLoginGate();
+        return;
+    }
+
     document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
     
     const target = document.getElementById(`view-${module}`);
@@ -2076,12 +2081,14 @@ function initializeApp() {
     }
     
     console.log('%c[MUSLIM LIFE OS™] Ready. Offline-first • Premium Islamic UX', 'color:#166534');
+    setTimeout(updateLoginGate, 500);
     if (localStorage.getItem('mlos_notif') === '1' && typeof schedulePrayerNotifications === 'function') {
         setTimeout(schedulePrayerNotifications, 2000);
     }
     if (window.MLOS_SB) {
         MLOS_SB.init().then(() => {
             refreshAuthUI();
+            updateLoginGate();
             console.log('%c[Supabase] Auth ready', 'color:#166534');
         }).catch(e => console.warn('Supabase init', e));
     }
@@ -2911,6 +2918,96 @@ async function mlosProfileSignOut() {
     hideProfileModal();
     showToast('Log keluar berjaya', 'success');
     if (typeof refreshAuthUI === 'function') refreshAuthUI();
+    updateLoginGate();
 }
 window.mlosProfileSignOut = mlosProfileSignOut;
+
+// -------------------- LOGIN GATE --------------------
+function isAuthRequired() {
+    return true; // set false to allow guest mode
+}
+
+function updateLoginGate() {
+    const gate = document.getElementById('login-gate');
+    if (!gate) return;
+    const logged = window.MLOS_SB && MLOS_SB.isLoggedIn();
+    if (isAuthRequired() && !logged) {
+        gate.classList.remove('hidden');
+        gate.style.display = 'flex';
+    } else {
+        gate.classList.add('hidden');
+        gate.style.display = 'none';
+    }
+}
+
+async function gateSignUp() {
+    const name = document.getElementById('gate-name')?.value?.trim();
+    const email = document.getElementById('gate-email')?.value?.trim();
+    const password = document.getElementById('gate-password')?.value || '';
+    const msg = document.getElementById('gate-msg');
+    if (!email || password.length < 6) {
+        if (msg) msg.textContent = 'Email & password (min 6) diperlukan';
+        return;
+    }
+    if (!window.MLOS_SB) {
+        if (msg) msg.textContent = 'Supabase belum ready';
+        return;
+    }
+    if (msg) msg.textContent = 'Mendaftar...';
+    const res = await MLOS_SB.signUp(email, password, name);
+    if (res.error) {
+        if (msg) msg.textContent = res.error;
+        return;
+    }
+    // try auto sign-in
+    const login = await MLOS_SB.signIn(email, password);
+    if (login.error) {
+        if (msg) msg.textContent = 'Daftar berjaya. Sila Log Masuk.';
+        return;
+    }
+    if (name && state.user) {
+        state.user.name = name;
+        if (typeof Store !== 'undefined') Store.save(state);
+        if (typeof updateHeaderProfile === 'function') updateHeaderProfile();
+    }
+    if (msg) msg.textContent = 'Berjaya!';
+    updateLoginGate();
+    if (typeof refreshAuthUI === 'function') refreshAuthUI();
+    showToast('Selamat datang!', 'success');
+}
+
+async function gateSignIn() {
+    const email = document.getElementById('gate-email')?.value?.trim();
+    const password = document.getElementById('gate-password')?.value || '';
+    const msg = document.getElementById('gate-msg');
+    if (!email || !password) {
+        if (msg) msg.textContent = 'Isi email & password';
+        return;
+    }
+    if (!window.MLOS_SB) {
+        if (msg) msg.textContent = 'Supabase belum ready';
+        return;
+    }
+    if (msg) msg.textContent = 'Log masuk...';
+    const res = await MLOS_SB.signIn(email, password);
+    if (res.error) {
+        if (msg) msg.textContent = res.error;
+        return;
+    }
+    const u = MLOS_SB.getUser();
+    if (u && state.user) {
+        state.user.name = u.user_metadata?.full_name || u.email?.split('@')[0] || 'Pengguna';
+        if (typeof Store !== 'undefined') Store.save(state);
+        if (typeof updateHeaderProfile === 'function') updateHeaderProfile();
+    }
+    if (msg) msg.textContent = '';
+    updateLoginGate();
+    if (typeof refreshAuthUI === 'function') refreshAuthUI();
+    showToast('Log masuk berjaya', 'success');
+}
+
+window.gateSignUp = gateSignUp;
+window.gateSignIn = gateSignIn;
+window.updateLoginGate = updateLoginGate;
+
 window.MLOS = { state, Store, showModule, celebrate, unlockAchievement };

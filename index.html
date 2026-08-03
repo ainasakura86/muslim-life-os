@@ -1323,5 +1323,27 @@
             });
         }
     </script>
+
+    <!-- LOGIN GATE — wajib login -->
+    <div id="login-gate" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-6">
+        <div class="w-full max-w-md glass rounded-3xl p-8 border border-emerald-500/20 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="text-emerald-400 text-xs tracking-[3px] mb-2">MUSLIM LIFE OS</div>
+                <div class="text-2xl font-semibold">Log Masuk / Daftar</div>
+                <p class="text-xs text-slate-400 mt-2">Wajib log masuk untuk guna app</p>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="gate-name" placeholder="Nama penuh" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                <input type="email" id="gate-email" placeholder="Email" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                <input type="password" id="gate-password" placeholder="Password (min 6)" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="gateSignUp()" class="flex-1 py-3 rounded-2xl bg-emerald-600 text-sm font-semibold">Daftar</button>
+                    <button type="button" onclick="gateSignIn()" class="flex-1 py-3 rounded-2xl border border-white/20 text-sm">Log Masuk</button>
+                </div>
+                <p id="gate-msg" class="text-xs text-center text-slate-500 min-h-[1.25rem]"></p>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
