@@ -597,6 +597,7 @@ function renderSolatModule() {
 function markPrayer(prayerKey, status) {
     const wasEmpty = !state.solat.today[prayerKey].status;
     state.solat.today[prayerKey].status = status;
+    try { enqueueSolatSync(prayerKey, !!status); } catch (e) {}
     
     const todayStr = new Date().toISOString().split('T')[0];
     state.solat.history.push({
@@ -2082,6 +2083,18 @@ function initializeApp() {
     
     console.log('%c[MUSLIM LIFE OS™] Ready. Offline-first • Premium Islamic UX', 'color:#166534');
     setTimeout(() => { updateLoginGate(); checkAuthRecovery(); }, 500);
+    window.addEventListener('online', () => {
+        updateLoginGate();
+        showToast('Online semula — sync data...', 'success');
+        flushSyncQueue();
+    });
+    window.addEventListener('offline', () => {
+        if (!(window.MLOS_SB && MLOS_SB.isLoggedIn())) {
+            updateLoginGate();
+        } else {
+            showToast('Mode offline — data lokal aktif', 'success');
+        }
+    });
     if (localStorage.getItem('mlos_notif') === '1' && typeof schedulePrayerNotifications === 'function') {
         setTimeout(schedulePrayerNotifications, 2000);
     }
@@ -2931,12 +2944,24 @@ function updateLoginGate() {
     const gate = document.getElementById('login-gate');
     if (!gate) return;
     const logged = window.MLOS_SB && MLOS_SB.isLoggedIn();
+    const online = navigator.onLine !== false;
+    const msg = document.getElementById('gate-msg');
+    const sub = document.getElementById('gate-subtitle');
+
     if (isAuthRequired() && !logged) {
         gate.classList.remove('hidden');
         gate.style.display = 'flex';
+        if (!online) {
+            if (sub) sub.textContent = 'Anda offline. Perlu internet untuk log masuk / daftar.';
+            if (msg) msg.textContent = 'Sambung internet, kemudian log masuk. Selepas login sekali, app boleh diguna offline.';
+        } else {
+            if (sub) sub.textContent = 'Wajib log masuk untuk guna app';
+        }
     } else {
         gate.classList.add('hidden');
         gate.style.display = 'none';
+        // Mark that user has successfully authenticated on this device
+        try { localStorage.setItem('mlos_has_session', '1'); } catch (e) {}
     }
 }
 
@@ -3112,5 +3137,74 @@ window.gateUpdatePassword = gateUpdatePassword;
 window.gateGoogle = gateGoogle;
 
 window.updateLoginGate = updateLoginGate;
+
+
+// -------------------- AUTO SYNC QUEUE --------------------
+function getSyncQueue() {
+    try {
+        return JSON.parse(localStorage.getItem('mlos_sync_queue') || '[]');
+    } catch (e) { return []; }
+}
+
+function saveSyncQueue(q) {
+    try { localStorage.setItem('mlos_sync_queue', JSON.stringify(q)); } catch (e) {}
+}
+
+function enqueueSolatSync(prayer, done) {
+    if (!(window.MLOS_SB && MLOS_SB.isLoggedIn())) return;
+    const date = new Date().toISOString().slice(0, 10);
+    let q = getSyncQueue();
+    // replace same prayer+date
+    q = q.filter(x => !(x.type === 'solat' && x.prayer === prayer && x.date === date));
+    q.push({ type: 'solat', prayer, done: !!done, date, ts: Date.now() });
+    saveSyncQueue(q);
+    if (navigator.onLine) {
+        flushSyncQueue();
+    }
+}
+
+async function flushSyncQueue() {
+    if (!navigator.onLine) return;
+    if (!(window.MLOS_SB && MLOS_SB.isLoggedIn())) return;
+    let q = getSyncQueue();
+    if (!q.length) {
+        // still push today's local solat state
+        await syncTodaySolatToCloud();
+        return;
+    }
+    const remain = [];
+    let ok = 0;
+    for (const item of q) {
+        if (item.type === 'solat') {
+            const res = await MLOS_SB.upsertSolatLog(item.prayer, item.done, item.date);
+            if (res && res.error) remain.push(item);
+            else ok++;
+        } else {
+            remain.push(item);
+        }
+    }
+    saveSyncQueue(remain);
+    await syncTodaySolatToCloud();
+    if (ok > 0) {
+        showToast('Auto sync: ' + ok + ' rekod dikemaskini', 'success');
+    }
+    if (typeof renderCloudFamily === 'function') {
+        try { await renderCloudFamily(); } catch (e) {}
+    }
+}
+
+async function syncTodaySolatToCloud() {
+    if (!(window.MLOS_SB && MLOS_SB.isLoggedIn())) return;
+    if (!navigator.onLine) return;
+    const map = { subuh: 'subuh', zohor: 'zohor', asar: 'asar', maghrib: 'maghrib', isyak: 'isyak' };
+    const today = state.solat && state.solat.today;
+    if (!today) return;
+    for (const key of Object.keys(map)) {
+        const st = today[key] && today[key].status;
+        try {
+            await MLOS_SB.upsertSolatLog(key, !!st);
+        } catch (e) {}
+    }
+}
 
 window.MLOS = { state, Store, showModule, celebrate, unlockAchievement };

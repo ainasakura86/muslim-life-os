@@ -1101,10 +1101,8 @@
                                 <input type="text" id="auth-name" placeholder="Nama penuh" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
                                 <input type="email" id="auth-email" placeholder="Email" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
                                 <input type="password" id="auth-password" placeholder="Password (min 6)" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="mlosSignUp()" class="flex-1 py-2.5 rounded-2xl bg-emerald-600 text-sm font-medium">Daftar</button>
-                                    <button type="button" onclick="mlosSignIn()" class="flex-1 py-2.5 rounded-2xl border border-white/20 text-sm">Log Masuk</button>
-                                </div>
+                                <button type="button" onclick="mlosSignIn()" class="w-full py-2.5 rounded-2xl bg-emerald-600 text-sm font-medium">Log Masuk</button>
+                                <p class="text-[10px] text-slate-500 text-center">Akaun diberi oleh admin selepas pembelian.</p>
                             </div>
                             
                             <div id="family-cloud-actions" class="hidden space-y-3">
@@ -1330,20 +1328,22 @@
         <div class="w-full max-w-md glass rounded-3xl p-8 border border-emerald-500/20 shadow-2xl">
             <div class="text-center mb-6">
                 <div class="text-emerald-400 text-xs tracking-[3px] mb-2">MUSLIM LIFE OS</div>
-                <div class="text-2xl font-semibold" id="gate-title">Log Masuk / Daftar</div>
-                <p class="text-xs text-slate-400 mt-2" id="gate-subtitle">Wajib log masuk untuk guna app</p>
+                <div class="text-2xl font-semibold" id="gate-title">Log Masuk</div>
+                <p class="text-xs text-slate-400 mt-2" id="gate-subtitle">Log masuk dengan akaun yang diberi admin</p>
+                <p class="text-[10px] text-slate-500 mt-1">Selepas login sekali, boleh guna offline.</p>
             </div>
             
             <!-- Main auth form -->
             <div id="gate-form-main" class="space-y-3">
-                <input type="text" id="gate-name" placeholder="Nama penuh (untuk daftar)" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
                 <input type="email" id="gate-email" placeholder="Email" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
-                <input type="password" id="gate-password" placeholder="Password (min 6)" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
-                <div class="flex gap-2 pt-1">
-                    <button type="button" onclick="gateSignUp()" class="flex-1 py-3 rounded-2xl bg-emerald-600 text-sm font-semibold">Daftar</button>
-                    <button type="button" onclick="gateSignIn()" class="flex-1 py-3 rounded-2xl border border-white/20 text-sm">Log Masuk</button>
-                </div>
+                <input type="password" id="gate-password" placeholder="Password" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                <input type="hidden" id="gate-name" value="">
+                <button type="button" onclick="gateSignIn()" class="w-full py-3 rounded-2xl bg-emerald-600 text-sm font-semibold">Log Masuk</button>
                 <button type="button" onclick="showForgotForm()" class="w-full text-xs text-emerald-400 hover:underline py-1">Lupa password?</button>
+                <p class="text-[11px] text-center text-slate-500 leading-relaxed pt-2">
+                    Tiada butang daftar awam.<br>
+                    Untuk dapatkan akaun, hubungi admin selepas pembelian.
+                </p>
                 <div class="relative py-2">
                     <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
                     <div class="relative flex justify-center text-[10px]"><span class="bg-slate-900 px-2 text-slate-500">atau</span></div>
