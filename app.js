@@ -69,7 +69,7 @@ let state = {
     },
     hafazan: [], // {surah, start, end, level, updated}
     tajwid: {
-        ikhfa: 40, idgham: 30, iqlab: 20, izhar: 50, qalqalah: 60, mad: 35, other: 10
+        ikhfa: 0, idgham: 0, iqlab: 0, izhar: 0, qalqalah: 0, mad: 0, other: 0
     },
     tahriri: [], // {score, mistakes, notes, date}
     selawat: {
@@ -116,10 +116,10 @@ let state = {
 
 const Store = {
     save() {
-        localStorage.setItem('muslimLifeOS_state_v2_user', JSON.stringify(state));
+        localStorage.setItem('muslimLifeOS_state_v3_clean', JSON.stringify(state));
     },
     load() {
-        const saved = localStorage.getItem('muslimLifeOS_state_v2_user') || localStorage.getItem('muslimLifeOS_state');
+        const saved = localStorage.getItem('muslimLifeOS_state_v3_clean') || localStorage.getItem('muslimLifeOS_state');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -151,7 +151,7 @@ const Store = {
         }
     },
     resetDemo() {
-        localStorage.removeItem('muslimLifeOS_state_v2_user');
+        localStorage.removeItem('muslimLifeOS_state_v3_clean');
         localStorage.removeItem('muslimLifeOS_state');
         location.reload();
     }
