@@ -8,12 +8,12 @@
 // -------------------- GLOBAL STATE & DATA STORE --------------------
 let state = {
     user: {
-        id: 'user-norain-001',
-        name: 'Nor Ain',
-        level: 12,
-        xp: 2840,
-        streak: 47,
-        location: 'Johor Bahru'
+        id: null,
+        name: 'Pengguna',
+        level: 1,
+        xp: 0,
+        streak: 0,
+        location: ''
     },
     solat: {
         today: {
@@ -62,9 +62,9 @@ let state = {
     },
     quran: {
         dailyTargetPages: 5,
-        todayPages: 3,
-        juzCompleted: 18,
-        totalKhatam: 4,
+        todayPages: 0,
+        juzCompleted: 0,
+        totalKhatam: 0,
         readings: []
     },
     hafazan: [], // {surah, start, end, level, updated}
@@ -92,20 +92,20 @@ let state = {
         monthlyTotal: 0
     },
     goals: [
-        { id: 'g1', type: 'tahajjud', title: '100 Tahajjud', current: 47, target: 100, icon: '🌙' },
-        { id: 'g2', type: 'solat-awal', title: '365 Solat Awal Waktu', current: 312, target: 365, icon: '🕌' },
-        { id: 'g3', type: 'khatam', title: '2 Full Khatam Al-Quran', current: 1, target: 2, icon: '📖' },
-        { id: 'g4', type: 'selawat', title: '1,000 Selawat', current: 680, target: 1000, icon: '🤲' },
-        { id: 'g5', type: 'sedekah', title: '100 Kali Sedekah', current: 23, target: 100, icon: '💝' }
+        { id: 'g1', type: 'tahajjud', title: '100 Tahajjud', current: 0, target: 100, icon: '🌙' },
+        { id: 'g2', type: 'solat-awal', title: '365 Solat Awal Waktu', current: 0, target: 365, icon: '🕌' },
+        { id: 'g3', type: 'khatam', title: '2 Full Khatam Al-Quran', current: 0, target: 2, icon: '📖' },
+        { id: 'g4', type: 'selawat', title: '1,000 Selawat', current: 0, target: 1000, icon: '🤲' },
+        { id: 'g5', type: 'sedekah', title: '100 Kali Sedekah', current: 0, target: 100, icon: '💝' }
     ],
     achievements: [
-        { code: 'streak_7', name: '7 Hari Berturut', desc: 'Solat 5 waktu 7 hari berturut-turut', unlocked: true, xp: 50, icon: '🔥' },
-        { code: 'streak_30', name: '30 Hari Streak', desc: 'Konsisten 30 hari penuh', unlocked: true, xp: 150, icon: '⚡' },
-        { code: 'first_khatam', name: 'Khatam Pertama', desc: 'Menamatkan 1 kali khatam Al-Quran', unlocked: true, xp: 300, icon: '📖' },
+        { code: 'streak_7', name: '7 Hari Berturut', desc: 'Solat 5 waktu 7 hari berturut-turut', unlocked: false, xp: 50, icon: '🔥' },
+        { code: 'streak_30', name: '30 Hari Streak', desc: 'Konsisten 30 hari penuh', unlocked: false, xp: 150, icon: '⚡' },
+        { code: 'first_khatam', name: 'Khatam Pertama', desc: 'Menamatkan 1 kali khatam Al-Quran', unlocked: false, xp: 300, icon: '📖' },
         { code: 'tahajjud_50', name: '50 Tahajjud', desc: 'Bangun malam 50 kali', unlocked: false, xp: 200, icon: '🌙' },
         { code: 'sedekah_10', name: 'Sedekah 10x', desc: 'Memberi sedekah 10 kali', unlocked: false, xp: 80, icon: '💝' },
         { code: 'zikir_1000', name: '1000 Zikir', desc: 'Jumlah 1000 zikir dalam sehari', unlocked: false, xp: 120, icon: '📿' },
-        { code: 'solat_awal_100', name: '100 Solat Awal', desc: 'Solat awal waktu 100 kali', unlocked: true, xp: 180, icon: '🕌' },
+        { code: 'solat_awal_100', name: '100 Solat Awal', desc: 'Solat awal waktu 100 kali', unlocked: false, xp: 180, icon: '🕌' },
         { code: 'muhasabah_30', name: 'Muhasabah Master', desc: 'Menulis muhasabah 30 hari', unlocked: false, xp: 150, icon: '✍️' }
     ],
     settings: {
@@ -116,10 +116,10 @@ let state = {
 
 const Store = {
     save() {
-        localStorage.setItem('muslimLifeOS_state_v1_1', JSON.stringify(state));
+        localStorage.setItem('muslimLifeOS_state_v2_user', JSON.stringify(state));
     },
     load() {
-        const saved = localStorage.getItem('muslimLifeOS_state_v1_1') || localStorage.getItem('muslimLifeOS_state');
+        const saved = localStorage.getItem('muslimLifeOS_state_v2_user') || localStorage.getItem('muslimLifeOS_state');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -151,7 +151,7 @@ const Store = {
         }
     },
     resetDemo() {
-        localStorage.removeItem('muslimLifeOS_state_v1_1');
+        localStorage.removeItem('muslimLifeOS_state_v2_user');
         localStorage.removeItem('muslimLifeOS_state');
         location.reload();
     }
@@ -303,6 +303,7 @@ function showModule(module) {
     if (module === 'selawat') updateSelawatUI();
     if (module === 'ai-imam') renderAIImam();
     if (module === 'family') renderFamily();
+    if (module === 'family-report') refreshFamilyReport();
     if (module === 'doa-hadis') renderDoaHadis();
     if (module === 'sunnah') renderSunnah();
     if (module === 'wirid') renderWirid();
@@ -331,6 +332,7 @@ function buildSidebarNav() {
         { id: 'selawat', label: 'Selawat', icon: 'heart' },
         { id: 'ai-imam', label: 'AI Imam', icon: 'bot' },
         { id: 'family', label: 'Family Mode', icon: 'users' },
+        { id: 'family-report', label: 'Family Report', icon: 'clipboard-list' },
         { id: 'doa-hadis', label: 'Doa & Hadis', icon: 'book-marked' },
         { id: 'sunnah', label: 'Sunnah Nabi', icon: 'sparkle' },
         { id: 'wirid', label: 'Bacaan Lepas Solat', icon: 'list-checks' },
@@ -1928,7 +1930,7 @@ function showProfileModal() {
     const modal = document.getElementById('profile-modal');
     const nameInput = document.getElementById('profile-fullname');
     
-    if (nameInput) nameInput.value = state.user.name || 'Nor Ain';
+    if (nameInput) nameInput.value = state.user.name || 'Pengguna';
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -2042,6 +2044,9 @@ function initializeApp() {
     }
     
     console.log('%c[MUSLIM LIFE OS™] Ready. Offline-first • Premium Islamic UX', 'color:#166534');
+    if (localStorage.getItem('mlos_notif') === '1' && typeof schedulePrayerNotifications === 'function') {
+        setTimeout(schedulePrayerNotifications, 2000);
+    }
     if (window.MLOS_SB) {
         MLOS_SB.init().then(() => {
             refreshAuthUI();
@@ -2610,5 +2615,258 @@ window.mlosJoinFamily = mlosJoinFamily;
 window.toggleMyCloudSolat = toggleMyCloudSolat;
 window.renderCloudFamily = renderCloudFamily;
 window.refreshAuthUI = refreshAuthUI;
+
+
+// -------------------- FAMILY REPORT + NOTIFICATIONS --------------------
+let reportRange = 'daily';
+
+function setReportRange(range) {
+    reportRange = range;
+    const d = document.getElementById('btn-report-daily');
+    const w = document.getElementById('btn-report-weekly');
+    if (d) {
+        d.className = range === 'daily'
+            ? 'px-4 py-2 rounded-2xl bg-emerald-600 text-sm font-medium'
+            : 'px-4 py-2 rounded-2xl border border-white/15 text-sm';
+    }
+    if (w) {
+        w.className = range === 'weekly'
+            ? 'px-4 py-2 rounded-2xl bg-emerald-600 text-sm font-medium'
+            : 'px-4 py-2 rounded-2xl border border-white/15 text-sm';
+    }
+    const title = document.getElementById('report-title');
+    if (title) title.textContent = range === 'daily' ? 'Laporan Hari Ini' : 'Laporan 7 Hari';
+    refreshFamilyReport();
+}
+
+async function refreshFamilyReport() {
+    const table = document.getElementById('family-report-table');
+    if (!table) return;
+
+    // Prefer cloud data
+    let members = [];
+    if (window.MLOS_SB && MLOS_SB.isLoggedIn()) {
+        if (reportRange === 'daily') {
+            const res = await MLOS_SB.getFamilySolatToday();
+            if (res.data && res.data.members) {
+                members = res.data.members.map(m => ({
+                    name: m.display_name || 'User',
+                    role: m.role,
+                    solat: m.solat,
+                    done: m.done,
+                    pct: Math.round((m.done / 5) * 100)
+                }));
+            } else if (res.error) {
+                table.innerHTML = `<div class="text-xs text-red-400">${res.error}</div>`;
+                return;
+            }
+        } else {
+            // Weekly: fetch last 7 days logs if possible
+            const res = await getFamilyWeeklyReport();
+            if (res.error) {
+                table.innerHTML = `<div class="text-xs text-amber-400">${res.error}</div><div class="text-xs text-slate-500 mt-2">Cuba laporan Harian, atau pastikan ahli dah tick solat.</div>`;
+            }
+            if (res.data) members = res.data;
+        }
+    }
+
+    // Fallback: local offline family members
+    if (!members.length && state.family && state.family.members) {
+        members = state.family.members.map(m => {
+            const solat = m.solat || {};
+            const done = ['subuh','zohor','asar','maghrib','isyak'].filter(p => solat[p]).length;
+            return {
+                name: m.name,
+                role: m.role,
+                solat,
+                done,
+                pct: Math.round((done / 5) * 100)
+            };
+        });
+    }
+
+    if (!members.length) {
+        table.innerHTML = `<div class="text-xs text-slate-500">Tiada data. Log masuk + join keluarga, atau tambah ahli lokal di Family Mode.</div>`;
+        setReportCards(0,0,0,0);
+        return;
+    }
+
+    let complete = 0, partial = 0, none = 0, sumPct = 0;
+    members.forEach(m => {
+        sumPct += m.pct;
+        if (m.done >= 5) complete++;
+        else if (m.done > 0) partial++;
+        else none++;
+    });
+    const avg = members.length ? Math.round(sumPct / members.length) : 0;
+    setReportCards(complete, partial, none, avg);
+
+    const labels = { subuh: 'Subuh', zohor: 'Zohor', asar: 'Asar', maghrib: 'Maghrib', isyak: 'Isyak' };
+    table.innerHTML = members.map(m => {
+        const chips = Object.keys(labels).map(p => {
+            const on = m.solat && m.solat[p];
+            // weekly may have counts
+            const val = typeof on === 'number' ? on : (on ? '✓' : '·');
+            const cls = (typeof on === 'number' ? on > 0 : on)
+                ? 'bg-emerald-600/40 text-emerald-100'
+                : 'bg-white/5 text-slate-500';
+            return `<span class="text-[10px] px-1.5 py-0.5 rounded ${cls}">${labels[p].slice(0,1)}${typeof on === 'number' ? on : ''}</span>`;
+        }).join('');
+        return `<div class="flex flex-wrap justify-between items-center gap-2 bg-white/5 rounded-2xl px-4 py-3 border border-white/10">
+            <div>
+                <div class="font-medium">${escapeHtml(m.name)}</div>
+                <div class="text-[10px] text-slate-400 capitalize">${escapeHtml(m.role || '')} · ${m.done}/5 · ${m.pct}%</div>
+            </div>
+            <div class="flex gap-1">${chips}</div>
+        </div>`;
+    }).join('');
+}
+
+function setReportCards(c, p, n, avg) {
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    set('rep-complete', c);
+    set('rep-partial', p);
+    set('rep-none', n);
+    set('rep-pct', avg + '%');
+}
+
+async function getFamilyWeeklyReport() {
+    if (!window.MLOS_SB || !MLOS_SB.isLoggedIn()) return { error: 'Log masuk dulu' };
+    const client = MLOS_SB.getSupabase && MLOS_SB.getSupabase();
+    if (!client) return { error: 'Supabase tak tersedia' };
+
+    const fam = await MLOS_SB.getMyFamily();
+    if (fam.error || !fam.data) return { error: fam.error || 'Belum ada keluarga' };
+
+    const userIds = fam.data.members.map(m => m.user_id);
+    if (!userIds.length) return { data: [] };
+
+    const start = new Date();
+    start.setDate(start.getDate() - 6);
+    const startStr = start.toISOString().slice(0, 10);
+
+    const { data: logs, error } = await client.from('solat_logs')
+        .select('*')
+        .in('user_id', userIds)
+        .gte('log_date', startStr)
+        .eq('completed', true);
+
+    if (error) return { error: error.message };
+
+    // per user: count unique prayer completions across 7 days (max 35)
+    const result = fam.data.members.map(m => {
+        const counts = { subuh: 0, zohor: 0, asar: 0, maghrib: 0, isyak: 0 };
+        (logs || []).filter(l => l.user_id === m.user_id).forEach(l => {
+            if (counts.hasOwnProperty(l.prayer_name)) counts[l.prayer_name]++;
+        });
+        const totalDone = Object.values(counts).reduce((a, b) => a + b, 0);
+        const pct = Math.round((totalDone / 35) * 100);
+        // for display chips use counts; done = average-ish out of 5 using today-equivalent
+        const todayLike = Object.values(counts).filter(x => x > 0).length;
+        return {
+            name: m.display_name || 'User',
+            role: m.role,
+            solat: counts,
+            done: todayLike,
+            pct,
+            weeklyTotal: totalDone
+        };
+    });
+    return { data: result };
+}
+
+// ---- Notifications ----
+function updateNotifStatus() {
+    const el = document.getElementById('notif-status');
+    if (!el) return;
+    if (!('Notification' in window)) {
+        el.textContent = 'Status: browser tak support notifikasi';
+        return;
+    }
+    el.textContent = 'Status: ' + Notification.permission;
+}
+
+async function enableNotifications() {
+    if (!('Notification' in window)) {
+        showToast('Browser tak support notifikasi', 'error');
+        return;
+    }
+    const perm = await Notification.requestPermission();
+    updateNotifStatus();
+    if (perm === 'granted') {
+        showToast('Notifikasi diaktifkan', 'success');
+        localStorage.setItem('mlos_notif', '1');
+        schedulePrayerNotifications();
+    } else {
+        showToast('Kebenaran notifikasi ditolak', 'error');
+    }
+}
+
+function testNotification() {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+        showToast('Aktifkan notifikasi dulu', 'error');
+        return;
+    }
+    new Notification('Muslim Life OS', {
+        body: 'Test berjaya. Anda akan dapat peringatan solat & ringkasan keluarga.',
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🕌</text></svg>'
+    });
+}
+
+function schedulePrayerNotifications() {
+    if (Notification.permission !== 'granted') return;
+    if (localStorage.getItem('mlos_notif') !== '1') return;
+
+    // Simple check every minute while page open
+    if (window._mlosNotifTimer) clearInterval(window._mlosNotifTimer);
+    window._mlosNotifTimer = setInterval(() => {
+        try {
+            const prayerCb = document.getElementById('notif-prayer');
+            if (prayerCb && !prayerCb.checked) return;
+            const times = state?.solat?.today;
+            if (!times) return;
+            const now = new Date();
+            const hhmm = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+            const names = { subuh: 'Subuh', zohor: 'Zohor', asar: 'Asar', maghrib: 'Maghrib', isyak: 'Isyak' };
+            Object.keys(names).forEach(k => {
+                const t = times[k]?.time;
+                if (!t) return;
+                // notify at exact minute
+                if (t.slice(0,5) === hhmm) {
+                    const key = 'notif_' + k + '_' + now.toDateString();
+                    if (sessionStorage.getItem(key)) return;
+                    sessionStorage.setItem(key, '1');
+                    new Notification('Waktu ' + names[k], {
+                        body: 'Sudah masuk waktu ' + names[k] + ' (' + t + '). Jangan lupa solat.',
+                        tag: 'prayer-' + k
+                    });
+                }
+            });
+        } catch (e) {}
+    }, 30000);
+
+    // Family summary once per session mid-day style
+    const famCb = document.getElementById('notif-family');
+    if (famCb && famCb.checked && !sessionStorage.getItem('fam_sum_today')) {
+        const h = new Date().getHours();
+        if (h >= 8 && h <= 21) {
+            sessionStorage.setItem('fam_sum_today', '1');
+            // soft reminder after 3s
+            setTimeout(() => {
+                if (Notification.permission === 'granted') {
+                    new Notification('Family Report', {
+                        body: 'Buka Family Report untuk semak solat ahli keluarga hari ini.',
+                        tag: 'family-summary'
+                    });
+                }
+            }, 5000);
+        }
+    }
+}
+
+window.setReportRange = setReportRange;
+window.refreshFamilyReport = refreshFamilyReport;
+window.enableNotifications = enableNotifications;
+window.testNotification = testNotification;
 
 window.MLOS = { state, Store, showModule, celebrate, unlockAchievement };

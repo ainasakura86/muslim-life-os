@@ -121,8 +121,8 @@
                             <img src="https://i.pravatar.cc/32?img=47" alt="Profile" class="w-full h-full object-cover">
                         </div>
                         <div class="hidden md:block">
-                            <div id="profile-name" class="text-sm font-semibold">Nor Ain</div>
-                            <div class="text-[10px] text-emerald-400">Level 12 • 2,840 XP</div>
+                            <div id="profile-name" class="text-sm font-semibold">Pengguna</div>
+                            <div class="text-[10px] text-emerald-400">Level 1 • 0 XP</div>
                         </div>
                     </div>
                 </div>
@@ -162,7 +162,7 @@
             <div id="view-dashboard" class="section active">
                 <div class="flex items-end justify-between mb-8">
                     <div>
-                        <h1 class="text-4xl font-semibold tracking-tighter">Assalamualaikum, <span class="text-emerald-400">Nor Ain</span></h1>
+                        <h1 class="text-4xl font-semibold tracking-tighter">Assalamualaikum, <span class="text-emerald-400" id="greet-name">Pengguna</span></h1>
                         <p class="text-slate-400 mt-1">Semoga hari ini penuh berkat dan ibadah yang diterima.</p>
                     </div>
                     <div class="text-right hidden md:block">
@@ -858,11 +858,11 @@
                 <div class="mb-6 glass rounded-3xl p-5 border border-white/10 flex items-center justify-between">
                     <div>
                         <div class="text-xs text-emerald-400 tracking-wider">CURRENT LEVEL</div>
-                        <div class="text-4xl font-semibold tabular-nums" id="ach-level">Level 12</div>
+                        <div class="text-4xl font-semibold tabular-nums" id="ach-level">Level 1</div>
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-emerald-400 tracking-wider">TOTAL XP</div>
-                        <div class="text-3xl font-semibold tabular-nums text-amber-400" id="ach-xp">2,840 XP</div>
+                        <div class="text-3xl font-semibold tabular-nums text-amber-400" id="ach-xp">0 XP</div>
                     </div>
                 </div>
                 
@@ -977,7 +977,61 @@
             </div>
 
             <!-- FAMILY MODE -->
-            <div id="view-family" class="section">
+            
+            <!-- FAMILY REPORT -->
+            <div id="view-family-report" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">FAMILY REPORT</div>
+                    <div class="text-3xl font-semibold tracking-tight">Laporan Keluarga</div>
+                    <div class="text-sm text-slate-400 mt-1">Harian &amp; mingguan — monitor ibadah ahli</div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button type="button" onclick="setReportRange('daily')" id="btn-report-daily" class="px-4 py-2 rounded-2xl bg-emerald-600 text-sm font-medium">Hari Ini</button>
+                    <button type="button" onclick="setReportRange('weekly')" id="btn-report-weekly" class="px-4 py-2 rounded-2xl border border-white/15 text-sm">7 Hari</button>
+                    <button type="button" onclick="refreshFamilyReport()" class="px-4 py-2 rounded-2xl border border-white/15 text-sm">↻ Refresh</button>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="report-summary-cards">
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold text-emerald-400" id="rep-complete">0</div>
+                        <div class="text-[10px] text-slate-400">Lengkap 5 waktu</div>
+                    </div>
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold text-amber-400" id="rep-partial">0</div>
+                        <div class="text-[10px] text-slate-400">Sebahagian</div>
+                    </div>
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold text-red-400" id="rep-none">0</div>
+                        <div class="text-[10px] text-slate-400">Belum solat</div>
+                    </div>
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold" id="rep-pct">0%</div>
+                        <div class="text-[10px] text-slate-400">Purata keluarga</div>
+                    </div>
+                </div>
+                
+                <div class="glass rounded-3xl p-6 border border-white/10 mb-6">
+                    <div class="font-semibold mb-4" id="report-title">Laporan Hari Ini</div>
+                    <div id="family-report-table" class="space-y-3 text-sm"></div>
+                </div>
+                
+                <div class="glass rounded-3xl p-6 border border-white/10">
+                    <div class="font-semibold mb-3">Notifikasi</div>
+                    <p class="text-xs text-slate-400 mb-4">Ingatkan solat &amp; ringkasan keluarga (browser notification).</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="enableNotifications()" class="px-4 py-2.5 rounded-2xl bg-emerald-600 text-sm font-medium">Aktifkan Notifikasi</button>
+                        <button type="button" onclick="testNotification()" class="px-4 py-2.5 rounded-2xl border border-white/15 text-sm">Test Notifikasi</button>
+                    </div>
+                    <div id="notif-status" class="text-xs text-slate-500 mt-3">Status: belum diminta</div>
+                    <div class="mt-4 space-y-2 text-xs text-slate-400">
+                        <label class="flex items-center gap-2"><input type="checkbox" id="notif-prayer" checked class="rounded"> Peringatan waktu solat (bila app dibuka)</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" id="notif-family" checked class="rounded"> Ringkasan keluarga (pagi / petang)</label>
+                    </div>
+                </div>
+            </div>
+
+<div id="view-family" class="section">
                 <div class="module-header rounded-3xl px-8 py-5 mb-6">
                     <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 26</div>
                     <div class="text-3xl font-semibold tracking-tight">Family Mode</div>
@@ -1196,7 +1250,7 @@
             <div class="space-y-5 text-sm">
                 <div>
                     <label class="text-xs block mb-1 text-emerald-400">FULL NAME</label>
-                    <input id="profile-fullname" value="Nor Ain Zid" class="w-full bg-slate-900 border border-white/10 px-4 py-3 rounded-2xl">
+                    <input id="profile-fullname" value="" class="w-full bg-slate-900 border border-white/10 px-4 py-3 rounded-2xl">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
