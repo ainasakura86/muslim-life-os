@@ -1,282 +1,1349 @@
-/* ============================================================
-   MUSLIM LIFE OS™ - Premium Islamic Glassmorphism UI
-   Apple-level polish | Emerald + Gold + Cream | Dark/Light
-   ============================================================ */
+<!DOCTYPE html>
+<html lang="ms-MY">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="MUSLIM LIFE OS™ — Your Complete Islamic Lifestyle Companion. Track Solat, Quran, Habits &amp; more with beautiful design.">
+    <meta name="theme-color" content="#065f46">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MUSLIM LIFE OS™ • Companion</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+    
+    <!-- Tailwind CSS via CDN (Production: self-host or build) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Lucide Icons (premium icons) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    
+    <!-- Confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Playfair+Display:wght@700&amp;display=swap');
+        
+        :root {
+            --font-sans: 'Inter', system_ui, sans-serif;
+        }
+        
+        body {
+            font-family: var(--font-sans);
+        }
+        
+        .logo-font {
+            font-family: 'Playfair Display', Georgia, serif;
+            letter-spacing: -0.025em;
+        }
 
-:root {
-  --emerald-50: #ecfdf5;
-  --emerald-100: #d1fae5;
-  --emerald-600: #059669;
-  --emerald-700: #047857;
-  --emerald-800: #065f46;
-  --emerald-900: #064e3b;
-  
-  --gold: #d4af37;
-  --gold-dark: #b8860b;
-  --cream: #fdfaf3;
-  --cream-dark: #f5f0e6;
-  
-  --dark-bg: #0f172a;
-  --dark-surface: #1e2937;
-  --dark-glass: rgba(15, 23, 42, 0.85);
-  
-  --light-bg: #f8fafc;
-  --light-surface: #ffffff;
-  
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-inverse: #f8fafc;
-  
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
-  --radius-3xl: 1.5rem;
-  
-  --shadow-soft: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-  --shadow-glass: 0 8px 32px rgb(0 0 0 / 0.12);
-  --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-}
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+            animation: fadeInUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-/* Dark mode (default elegant) */
-html.dark {
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --dark-bg: #0f172a;
-  --dark-surface: #1e2937;
-  color-scheme: dark;
-}
+        .nav-active {
+            background-color: rgba(5, 150, 105, 0.12);
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .dark .nav-active {
+            background-color: rgba(52, 211, 153, 0.12);
+            color: #34d399;
+        }
 
-/* Glassmorphism Core */
-.glass {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: var(--shadow-glass);
-}
+        .prayer-card {
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .prayer-card.marked {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.06);
+        }
 
-.dark .glass {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-}
+        .metric-value {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 dark:bg-slate-950">
+    <!-- Top Navigation Bar -->
+    <nav class="sticky top-0 z-50 border-b border-white/10 bg-slate-900/80 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between px-6 h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-x-3">
+                    <div class="w-9 h-9 rounded-2xl emerald-gradient flex items-center justify-center shadow-inner">
+                        <span class="text-white text-2xl font-bold tracking-tighter">م</span>
+                    </div>
+                    <div>
+                        <div class="logo-font text-2xl font-semibold tracking-tighter">MUSLIM LIFE OS</div>
+                        <div class="text-[10px] text-emerald-400 -mt-1 font-medium">LIFESTYLE COMPANION</div>
+                    </div>
+                </div>
 
-.glass-gold {
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  box-shadow: 0 8px 32px rgb(212 175 55 / 0.1);
-}
+                <!-- Header Right -->
+                <div class="flex items-center gap-x-4">
+                    <!-- Greeting + Date -->
+                    <div class="hidden md:block text-right">
+                        <div id="greeting" class="text-sm font-medium text-emerald-300"></div>
+                        <div id="current-date" class="text-xs text-slate-400"></div>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                            class="w-9 h-9 flex items-center justify-center rounded-2xl hover:bg-white/5 transition-colors border border-white/10"
+                            title="Toggle Dark/Light Mode">
+                        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
+                    
+                    <!-- Profile -->
+                    <div onclick="showProfileModal()" class="flex items-center gap-x-2 cursor-pointer">
+                        <div class="w-8 h-8 rounded-2xl overflow-hidden ring-2 ring-emerald-500/30">
+                            <img src="https://i.pravatar.cc/32?img=47" alt="Profile" class="w-full h-full object-cover">
+                        </div>
+                        <div class="hidden md:block">
+                            <div id="profile-name" class="text-sm font-semibold">Pengguna</div>
+                            <div class="text-[10px] text-emerald-400">Level 1 • 0 XP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-/* Premium Card Styles */
-.premium-card {
-  border-radius: var(--radius-3xl);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
+    <div class="max-w-7xl mx-auto flex">
+        
+        <!-- Sidebar Navigation (Desktop) -->
+        <div class="hidden lg:flex w-72 flex-col border-r border-white/10 bg-slate-900/60 min-h-[calc(100vh-4rem)] p-4">
+            <div class="px-3 mb-6">
+                <div class="text-xs uppercase tracking-[2px] text-emerald-400 font-semibold mb-3 px-3">MENU UTAMA</div>
+                
+                <nav class="space-y-1" id="sidebar-nav">
+                    <!-- Populated by JS -->
+                </nav>
+            </div>
+            
+            <div class="mt-auto px-3">
+                <div class="glass rounded-3xl p-4 text-center border border-white/10">
+                    <div class="text-emerald-400 text-xs tracking-widest mb-1">JOURNEY</div>
+                    <div class="text-3xl font-semibold tabular-nums" id="sidebar-streak">47</div>
+                    <div class="text-xs text-slate-400">Hari Berturut-turut</div>
+                    
+                    <div class="mt-3 pt-3 border-t border-white/10 text-[10px] text-emerald-300">
+                        12 badges unlocked
+                    </div>
+                </div>
+            </div>
+        </div>
 
-.premium-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-premium);
-}
+        <!-- Main Content -->
+        <div class="flex-1 p-6 lg:p-8 max-w-[980px] w-full mx-auto">
+            
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="section active">
+                <div class="flex items-end justify-between mb-8">
+                    <div>
+                        <h1 class="text-4xl font-semibold tracking-tighter">Assalamualaikum, <span class="text-emerald-400" id="greet-name">Pengguna</span></h1>
+                        <p class="text-slate-400 mt-1">Semoga hari ini penuh berkat dan ibadah yang diterima.</p>
+                    </div>
+                    <div class="text-right hidden md:block">
+                        <div id="hijri-date" class="text-emerald-400 font-medium"></div>
+                        <div id="gregorian-date" class="text-xs text-slate-500"></div>
+                    </div>
+                </div>
 
-.premium-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--gold), transparent);
-  opacity: 0.3;
-}
+                <!-- Prayer Times + Countdown -->
+                <div class="glass rounded-3xl p-6 mb-8 border border-white/10">
+                    <div class="flex justify-between items-center mb-5">
+                        <div>
+                            <div class="uppercase text-xs tracking-[1.5px] text-emerald-400 font-semibold" id="prayer-location-label">WAKTU SOLAT • JOHOR BAHRU • JAKIM</div>
+                            <div class="text-xl font-semibold" id="current-or-next-prayer-label">Memuatkan waktu solat...</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400">Next Prayer</div>
+                            <div id="next-prayer-countdown" class="font-mono text-3xl font-semibold text-emerald-400 tabular-nums">--:--:--</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-5 gap-3" id="prayer-times-grid">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+                    <div class="mt-3 text-[10px] text-slate-500 text-center" id="prayer-source-note">Sumber: AlAdhan API (JAKIM method) • Offline cache tersedia</div>
+                </div>
 
-/* Islamic Elegant Accents */
-.islamic-border {
-  border-image: linear-gradient(to right, var(--emerald-700), var(--gold), var(--emerald-700)) 1;
-}
+                <!-- Quick Stats Row -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="premium-card glass rounded-3xl p-5 border border-white/10">
+                        <div class="flex justify-between">
+                            <div>
+                                <div class="text-emerald-400 text-xs tracking-wider">CURRENT STREAK</div>
+                                <div class="text-5xl font-semibold tabular-nums mt-1" id="streak-count">47</div>
+                                <div class="text-xs text-emerald-300">hari berturut-turut</div>
+                            </div>
+                            <div class="text-emerald-400/70">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17.657 18.657A8 8 0 016.343 7.343m11.314 11.314a8 8 0 01-11.314-11.314" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="premium-card glass rounded-3xl p-5 border border-white/10">
+                        <div class="text-emerald-400 text-xs tracking-wider">IBADAH SCORE</div>
+                        <div class="flex items-baseline gap-x-2 mt-1">
+                            <div class="text-5xl font-semibold tabular-nums" id="ibadah-score">0</div>
+                            <div class="text-emerald-400 text-sm">/ 100</div>
+                        </div>
+                        <div class="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div class="h-2 bg-emerald-500 rounded-full w-[0%]" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="premium-card glass rounded-3xl p-5 border border-white/10">
+                        <div class="text-emerald-400 text-xs tracking-wider">LIFE BALANCE</div>
+                        <div class="flex items-baseline gap-x-2 mt-1">
+                            <div class="text-5xl font-semibold tabular-nums" id="life-balance">0</div>
+                        </div>
+                        <div class="flex gap-x-1 mt-4 text-[10px]">
+                            <div class="px-2 py-0.5 bg-emerald-900/60 text-emerald-400 rounded">Solat 0</div>
+                            <div class="px-2 py-0.5 bg-amber-900/60 text-amber-400 rounded">Quran 0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="premium-card glass rounded-3xl p-5 border border-white/10 flex flex-col justify-between">
+                        <div>
+                            <div class="text-emerald-400 text-xs tracking-wider">TODAY'S GOALS</div>
+                            <div class="mt-1 text-3xl font-semibold">0/7 <span class="text-base font-normal text-slate-400">completed</span></div>
+                        </div>
+                        <div class="text-xs text-emerald-300">Mulakan ibadah hari ini.</div>
+                    </div>
+                </div>
 
-.gold-accent {
-  color: var(--gold);
-}
+                <!-- Today's Progress + Motivation -->
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <!-- Today's Progress -->
+                    <div class="lg:col-span-3 premium-card glass rounded-3xl p-6 border border-white/10">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="font-semibold">Today's Progress</div>
+                            <div class="text-xs px-3 py-1 rounded-full bg-emerald-900/40 text-emerald-400">0% complete</div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between text-sm">
+                                <div class="flex items-center gap-x-2"><span class="text-emerald-400">●</span> Solat</div>
+                                <div class="font-medium tabular-nums">0/5</div>
+                            </div>
+                            <div class="h-2.5 bg-white/10 rounded-full"><div class="h-2.5 bg-emerald-500 rounded-full w-[0%]"></div></div>
+                            
+                            <div class="flex justify-between text-sm">
+                                <div class="flex items-center gap-x-2"><span class="text-emerald-400">●</span> Quran</div>
+                                <div class="font-medium tabular-nums">0/5 pages</div>
+                            </div>
+                            <div class="h-2.5 bg-white/10 rounded-full"><div class="h-2.5 bg-emerald-500 rounded-full w-[0%]"></div></div>
+                            
+                            <div class="flex justify-between text-sm">
+                                <div class="flex items-center gap-x-2"><span class="text-emerald-400">●</span> Zikir</div>
+                                <div class="font-medium tabular-nums">0/100</div>
+                            </div>
+                            <div class="h-2.5 bg-white/10 rounded-full"><div class="h-2.5 bg-emerald-500 rounded-full w-[0%]"></div></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Daily Motivation + Verse -->
+                    <div class="lg:col-span-2 premium-card glass rounded-3xl p-6 border border-white/10 flex flex-col">
+                        <div class="uppercase tracking-[1px] text-xs text-emerald-400 mb-2">AYAT HARI INI</div>
+                        <div class="italic text-lg leading-tight">"Dan barangsiapa yang bertakwa kepada Allah, niscaya Dia akan mengadakan baginya jalan keluar."</div>
+                        <div class="mt-auto pt-4 text-xs text-emerald-300">— Surah At-Talaq : 2-3</div>
+                        
+                        <div class="mt-5 pt-4 border-t border-white/10 text-xs">
+                            <span class="font-medium text-emerald-400">Hadith:</span> "Sebaik-baik kamu adalah yang mempelajari Al-Quran dan mengajarkannya."
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity + Quick Actions -->
+                <div class="mt-8">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <div class="font-semibold text-lg">Recent Activities</div>
+                        <button onclick="showModule('stats')" class="text-xs flex items-center gap-x-1 text-emerald-400 hover:text-emerald-300 transition-colors">VIEW ALL →</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm" id="recent-activities">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </div>
 
-.emerald-gradient {
-  background: linear-gradient(135deg, var(--emerald-700), var(--emerald-800));
-}
+            <!-- SOLAT MODULE -->
+            <div id="view-solat" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6 flex items-center justify-between">
+                    <div>
+                        <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 01</div>
+                        <div class="text-3xl font-semibold tracking-tight">Solat Tracker</div>
+                    </div>
+                    <button onclick="markAllPrayersToday()" 
+                            class="px-5 py-2.5 text-sm rounded-2xl bg-white/90 hover:bg-white text-emerald-900 font-semibold flex items-center gap-x-2 transition-all active:scale-[0.985]">
+                        <span>Mark All Awal Waktu</span>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="solat-prayer-cards">
+                    <!-- Dynamically generated prayer cards -->
+                </div>
+                
+                <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Prayer Heatmap -->
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4 flex items-center justify-between">
+                            <span>Prayer Heatmap (30 Hari)</span>
+                            <span class="text-xs text-emerald-400" id="heatmap-consistency">0% consistency</span>
+                        </div>
+                        <div id="prayer-heatmap" class="grid grid-cols-10 gap-1.5"></div>
+                        <div class="flex justify-between text-[10px] text-slate-500 mt-3">
+                            <div>Low</div><div>High</div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4">Monthly Completion</div>
+                        <canvas id="monthly-prayer-chart" class="w-full h-40"></canvas>
+                    </div>
+                </div>
+            </div>
 
-/* Prayer Status Badges */
-.status-badge {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-weight: 600;
-  letter-spacing: -.025em;
-}
+            <!-- QADA SOLAT MODULE -->
+            <div id="view-qada" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 02</div>
+                    <div class="text-3xl font-semibold tracking-tight">Qada Solat Tracker</div>
+                </div>
+                
+                <div class="glass rounded-3xl p-6 mb-6 border border-white/10">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <div class="text-xs text-emerald-400 tracking-wider">JUMLAH HUTANG SOLAT</div>
+                            <div class="text-4xl font-semibold tabular-nums mt-1" id="qada-total-remaining">0</div>
+                            <div class="text-xs text-slate-400">baki perlu diganti</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-emerald-400 tracking-wider">PROGRESS KESELURUHAN</div>
+                            <div class="text-3xl font-semibold tabular-nums mt-1" id="qada-overall-percent">0%</div>
+                            <div class="w-40 h-2.5 bg-white/10 rounded-full mt-2 overflow-hidden">
+                                <div id="qada-overall-bar" class="h-2.5 bg-emerald-500 rounded-full transition-all" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-slate-400" id="qada-forecast">AI Prediction: Tetapkan hutang dahulu untuk ramalan.</div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="qada-cards">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="mt-8 glass rounded-3xl p-6 border border-white/10">
+                    <div class="font-semibold mb-4">Cara Guna</div>
+                    <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside">
+                        <li>Masukkan <strong>Total Debt</strong> (berapa kali solat yang tertinggal) untuk setiap waktu.</li>
+                        <li>Setiap kali anda solat qada, tekan <strong>+1 Completed</strong>.</li>
+                        <li>Progress dan ramalan siap akan dikira automatik.</li>
+                        <li>Data disimpan offline di peranti anda.</li>
+                    </ul>
+                </div>
+            </div>
 
-.status-awal { background-color: #10b981; color: white; }
-.status-lewat { background-color: #f59e0b; color: white; }
-.status-qada { background-color: #ef4444; color: white; }
-.status-jemaah { background-color: #3b82f6; color: white; }
+            <!-- QADA PUASA MODULE -->
+            <div id="view-qada-puasa" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 03</div>
+                    <div class="text-3xl font-semibold tracking-tight">Qada Puasa</div>
+                </div>
+                
+                <div class="glass rounded-3xl p-6 mb-6 border border-white/10">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-xs text-emerald-400 tracking-wider">TOTAL HUTANG</div>
+                            <div class="text-4xl font-semibold tabular-nums mt-1" id="qp-total">0</div>
+                            <div class="text-[10px] text-slate-400">hari</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-emerald-400 tracking-wider">TELAH SIAP</div>
+                            <div class="text-4xl font-semibold tabular-nums mt-1 text-emerald-400" id="qp-done">0</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-emerald-400 tracking-wider">BAKI</div>
+                            <div class="text-4xl font-semibold tabular-nums mt-1" id="qp-remain">0</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-emerald-400 tracking-wider">PROGRESS</div>
+                            <div class="text-4xl font-semibold tabular-nums mt-1" id="qp-percent">0%</div>
+                        </div>
+                    </div>
+                    <div class="mt-5 h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div id="qp-bar" class="h-3 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all" style="width:0%"></div>
+                    </div>
+                    <div class="mt-4 text-xs text-slate-400" id="qp-forecast">Tetapkan jumlah hutang untuk melihat ramalan.</div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4">Kemaskini Hutang</div>
+                        <div class="flex gap-3 items-end">
+                            <div class="flex-1">
+                                <label class="text-xs text-slate-400 block mb-1.5">Total hari hutang puasa</label>
+                                <input type="number" id="qp-debt-input" min="0" value="0" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                            </div>
+                            <button onclick="setQadaPuasaDebt()" class="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold">Set</button>
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="adjustQadaPuasa(1)" class="flex-1 py-2.5 rounded-2xl border border-white/15 text-sm hover:bg-white/5">+1 Hari</button>
+                            <button onclick="adjustQadaPuasa(-1)" class="flex-1 py-2.5 rounded-2xl border border-white/15 text-sm hover:bg-white/5">−1 Hari</button>
+                        </div>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4">Rekod Qada</div>
+                        <p class="text-sm text-slate-400 mb-4">Setiap kali anda berpuasa qada, tekan butang di bawah.</p>
+                        <button onclick="completeQadaPuasa()" class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold active:scale-[0.98] transition-all">
+                            +1 Qada Puasa Selesai
+                        </button>
+                        <div class="mt-4 text-xs text-center text-slate-500">Target selesai boleh disesuaikan di Settings nanti</div>
+                    </div>
+                </div>
+            </div>
 
-/* Digital Tasbih Big Counter */
-.tasbih-counter {
-  font-size: 5.5rem;
-  line-height: 1;
-  font-weight: 700;
-  font-feature-settings: "tnum";
-  transition: all 0.1s cubic-bezier(0.23, 1.0, 0.32, 1);
-}
+            <!-- SOLAT SUNAT MODULE -->
+            <div id="view-solat-sunat" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 04</div>
+                    <div class="text-3xl font-semibold tracking-tight">Solat Sunat</div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="sunat-prayer-grid">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="mt-6 glass rounded-3xl p-5 border border-white/10 text-center">
+                    <div class="text-xs text-emerald-400 tracking-wider">HARI INI</div>
+                    <div class="text-3xl font-semibold mt-1" id="sunat-today-count">0</div>
+                    <div class="text-xs text-slate-400">solat sunat direkodkan</div>
+                </div>
+            </div>
 
-.tasbih-counter:active {
-  transform: scale(0.96);
-}
+            <!-- PUASA SUNAT MODULE -->
+            <div id="view-puasa-sunat" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 14</div>
+                    <div class="text-3xl font-semibold tracking-tight">Puasa Sunat</div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="puasa-sunat-grid">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="mt-6 glass rounded-3xl p-5 border border-white/10">
+                    <div class="font-semibold mb-3">Sejarah Terkini</div>
+                    <div id="puasa-sunat-history" class="space-y-2 text-sm max-h-48 overflow-y-auto">
+                        <div class="text-xs text-slate-500 text-center py-4">Belum ada rekod</div>
+                    </div>
+                </div>
+            </div>
 
-/* Progress Ring */
-.progress-ring {
-  transition: stroke-dashoffset 0.5s ease;
-}
+            <!-- ZIKIR / DIGITAL TASBIH MODULE -->
+            <div id="view-zikir" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 10</div>
+                    <div class="text-3xl font-semibold tracking-tight">Digital Tasbih &amp; Zikir</div>
+                </div>
+                
+                <div class="max-w-md mx-auto">
+                    <!-- Zikir Type Selector -->
+                    <div class="flex flex-wrap justify-center gap-2 mb-5" id="zikir-types">
+                        <button onclick="setZikirType('subhanallah')" data-type="subhanallah" class="zikir-type-btn px-4 py-2 rounded-2xl text-xs font-medium border border-emerald-500/50 bg-emerald-900/30 text-emerald-300">Subhanallah</button>
+                        <button onclick="setZikirType('alhamdulillah')" data-type="alhamdulillah" class="zikir-type-btn px-4 py-2 rounded-2xl text-xs font-medium border border-white/15 text-slate-300">Alhamdulillah</button>
+                        <button onclick="setZikirType('allahuakbar')" data-type="allahuakbar" class="zikir-type-btn px-4 py-2 rounded-2xl text-xs font-medium border border-white/15 text-slate-300">Allahu Akbar</button>
+                        <button onclick="setZikirType('selawat')" data-type="selawat" class="zikir-type-btn px-4 py-2 rounded-2xl text-xs font-medium border border-white/15 text-slate-300">Selawat</button>
+                        <button onclick="setZikirType('lailaha')" data-type="lailaha" class="zikir-type-btn px-4 py-2 rounded-2xl text-xs font-medium border border-white/15 text-slate-300">La ilaha illallah</button>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-8 text-center border border-white/10">
+                        <div id="zikir-label" class="mb-2 text-emerald-400 text-sm tracking-widest font-medium">SUBHANALLAH</div>
+                        
+                        <div id="zikir-counter" 
+                             class="tasbih-counter my-6 text-emerald-400 font-bold tabular-nums select-none cursor-pointer"
+                             onclick="incrementZikir()">0</div>
+                        
+                        <div class="text-xs text-slate-400 mb-6">Tap the number to count • Haptic feel</div>
+                        
+                        <div class="flex gap-x-3 justify-center">
+                            <button onclick="resetZikir()" 
+                                    class="flex-1 py-3 rounded-2xl border border-white/20 hover:bg-white/5 active:bg-white/10 text-sm font-medium transition-colors">RESET</button>
+                            
+                            <button onclick="saveZikirSession()" 
+                                    class="flex-1 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-sm font-semibold text-white transition-colors">SAVE SESSION</button>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-white/10">
+                            <div class="flex justify-between text-xs mb-1.5 px-1">
+                                <div>Daily Target</div>
+                                <div class="font-medium text-emerald-400"><span id="zikir-daily">0</span> / 100</div>
+                            </div>
+                            <div class="h-2.5 bg-white/10 rounded-full overflow-hidden">
+                                <div id="zikir-progress-bar" class="h-2.5 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 text-center text-xs text-slate-400">Setiap 33 count akan ada getaran kecil • History disimpan offline</div>
+            </div>
 
-/* Heatmap */
-.heatmap-cell {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  transition: transform 0.1s ease;
-}
+            <!-- QURAN MODULE -->
+            <div id="view-quran" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6 flex items-center justify-between">
+                    <div>
+                        <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 05 • 06</div>
+                        <div class="text-3xl font-semibold tracking-tight">Al-Quran &amp; Khatam</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div class="lg:col-span-3 glass rounded-3xl p-7 border border-white/10">
+                        <div class="font-semibold mb-5">Log Bacaan Hari Ini</div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1.5">Surah (1–114)</label>
+                                <select id="quran-surah" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 max-h-48">
+                                    <!-- Populated by JS with all 114 Surah -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1.5">Muka Surat Dibaca</label>
+                                <input type="number" id="quran-pages" value="2" min="1" max="20" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label class="text-xs text-slate-400 block mb-1.5">Minit Bacaan</label>
+                            <input type="range" id="quran-minutes" min="5" max="120" step="5" value="25" class="w-full accent-emerald-500">
+                            <div class="flex justify-between text-xs"><div>5 min</div><div id="minutes-value">25 min</div></div>
+                        </div>
+                        
+                        <button onclick="logQuranReading()" 
+                                class="mt-6 w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold active:scale-[0.985] transition-all">
+                            Log Bacaan
+                        </button>
+                        
+                        <!-- Audio Player — Sahih source only -->
+                        <div class="mt-6 pt-5 border-t border-white/10">
+                            <div class="font-semibold text-sm mb-3">Dengar Tilawah (Full Surah)</div>
+                            <select id="quran-reciter" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm mb-3">
+                                <option value="alafasy">Mishary Rashid Alafasy</option>
+                                <option value="sudais">Abdurrahman As-Sudais</option>
+                                <option value="maher">Maher Al-Muaiqly</option>
+                                <option value="husary">Mahmoud Khalil Al-Husary</option>
+                                <option value="minshawi">Muhammad Siddiq Al-Minshawi</option>
+                                <option value="shatri">Abu Bakr Ash-Shatri</option>
+                                <option value="basit">Abdul Basit Abdus Samad</option>
+                            </select>
+                            <div class="flex gap-2">
+                                <button onclick="playQuranAudio()" id="btn-play-quran" class="flex-1 py-3 rounded-2xl bg-amber-600/90 hover:bg-amber-500 text-sm font-semibold text-white">
+                                    ▶ Mainkan Surah
+                                </button>
+                                <button onclick="stopQuranAudio()" class="px-4 py-3 rounded-2xl border border-white/20 text-sm">Stop</button>
+                            </div>
+                            <audio id="quran-audio" class="w-full mt-2" controls style="height:36px; display:none;"></audio>
+                            <div class="text-[10px] text-slate-500 mt-2 leading-tight">
+                                Sumber sahih: mp3quran.net (server rasmi) • Sheikh terkenal yang telah diuji berfungsi
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-2 glass rounded-3xl p-7 border border-white/10">
+                        <div class="font-semibold mb-4">Progress Khatam</div>
+                        <div class="text-center py-2">
+                            <div class="text-6xl font-semibold tabular-nums text-emerald-400" id="khatam-juz">0</div>
+                            <div class="text-xs tracking-widest text-emerald-400/70">JUZ SELESAI</div>
+                            
+                            <div class="my-4">
+                                <div class="h-3 bg-white/10 rounded-full overflow-hidden">
+                                    <div id="khatam-bar" class="h-3 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all" style="width:0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-xs" id="khatam-estimate">Anggaran siap: —</div>
+                            <div class="text-xs text-emerald-300 mt-2">Total Khatam: <span class="font-semibold" id="khatam-total">0</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tips 30 Hari Khatam -->
+                <div class="mt-6 glass rounded-3xl p-6 border border-white/10">
+                    <div class="font-semibold mb-3 flex items-center gap-2">
+                        <span>📖</span> Tips Khatam Al-Quran dalam 30 Hari
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300">
+                        <ul class="space-y-2 list-disc list-inside">
+                            <li><strong>1 Juz sehari</strong> = 30 hari tepat (paling popular)</li>
+                            <li>Atau <strong>~20 muka surat</strong> sehari (604 muka ÷ 30)</li>
+                            <li>Baca selepas Subuh + sebelum tidur (pecahkan)</li>
+                            <li>Gunakan app / mushaf yang sama setiap hari</li>
+                        </ul>
+                        <ul class="space-y-2 list-disc list-inside">
+                            <li>Tanda bookmark / bilangan juz yang telah selesai</li>
+                            <li>Dengar tilawah semasa perjalanan</li>
+                            <li>Niat ikhlas + doa dimudahkan</li>
+                            <li>Jika tertinggal, ganti esok — jangan putus asa</li>
+                        </ul>
+                    </div>
+                    <div class="mt-4 text-xs text-emerald-400/80">Target: 1 Juz/hari ≈ Khatam setiap bulan. Mulakan hari ini.</div>
+                </div>
+                
+                <div class="mt-4" id="quran-history-list"></div>
+            </div>
 
-.heatmap-cell:hover {
-  transform: scale(1.3);
-  z-index: 10;
-}
+            <!-- HAFAZAN MODULE -->
+            <div id="view-hafazan" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 07</div>
+                    <div class="text-3xl font-semibold tracking-tight">Hafazan Tracker</div>
+                </div>
+                
+                <div class="glass rounded-3xl p-6 mb-6 border border-white/10">
+                    <div class="font-semibold mb-4">Tambah / Kemaskini Hafazan</div>
+                    <div class="flex gap-2 mb-3">
+                        <button type="button" onclick="filterHafazSurah('all')" class="px-3 py-1.5 text-xs rounded-xl border border-white/15 hover:bg-white/5">Semua</button>
+                        <button type="button" onclick="filterHafazSurah('amma')" class="px-3 py-1.5 text-xs rounded-xl border border-emerald-500/40 bg-emerald-900/20 text-emerald-300">Juz Amma (78–114)</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Surah</label>
+                            <select id="hafaz-surah" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-3 py-2.5 text-sm mt-1 max-h-40">
+                                <!-- filled by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Ayat Mula</label>
+                            <input type="number" id="hafaz-start" min="1" value="1" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-3 py-2.5 text-sm mt-1">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Ayat Akhir</label>
+                            <input type="number" id="hafaz-end" min="1" value="7" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-3 py-2.5 text-sm mt-1">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Tahap</label>
+                            <select id="hafaz-level" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-3 py-2.5 text-sm mt-1">
+                                <option value="new">Baru</option>
+                                <option value="learning">Sedang hafal</option>
+                                <option value="good">Baik</option>
+                                <option value="excellent">Sangat Baik</option>
+                                <option value="mastered">Kuat / Lancar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="addHafazan()" class="mt-4 w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm">Simpan Hafazan</button>
+                </div>
+                
+                <div id="hafazan-list" class="space-y-3"></div>
+            </div>
 
-/* Navigation */
-.nav-link {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: var(--radius-xl);
-}
+            <!-- TAJWID & TAHRIRI -->
+            <div id="view-tajwid" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 08 • 09</div>
+                    <div class="text-3xl font-semibold tracking-tight">Tajwid &amp; Tahriri</div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4">Progress Tajwid</div>
+                        <div id="tajwid-list" class="space-y-3"></div>
+                        <div class="mt-6 pt-4 border-t border-white/10">
+                            <div class="font-semibold text-sm mb-3">Hukum Tajwid (Ringkas)</div>
+                            <div id="tajwid-info" class="space-y-2 text-xs text-slate-300"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4">Ruang Tahriri (Tracing / Menulis)</div>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-slate-400">Surah yang di-trace</label>
+                                <select id="tahriri-surah" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm mt-1" onchange="loadTahririText()">
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs text-slate-400">Ayat Mula</label>
+                                    <input type="number" id="tahriri-ayat-start" min="1" value="1" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm mt-1" onchange="loadTahririText()">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400">Ayat Akhir</label>
+                                    <input type="number" id="tahriri-ayat-end" min="1" value="5" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm mt-1" onchange="loadTahririText()">
+                                </div>
+                            </div>
+                            
+                            <button onclick="loadTahririText()" class="w-full py-2.5 rounded-2xl border border-emerald-500/40 text-emerald-300 text-sm hover:bg-emerald-900/20">
+                                📖 Papar Bacaan untuk Trace
+                            </button>
+                            
+                            <div id="tahriri-text-area" class="hidden mt-1 rounded-2xl bg-slate-950/90 border border-white/10 p-5 min-h-[120px]">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                    <div class="text-[10px] text-slate-500 tracking-wider">TEKS UTHMANI — TRACE SERTA TENGGOK</div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="zoomTahririText(-2)" class="w-8 h-8 rounded-xl border border-white/15 text-sm hover:bg-white/10" title="Zoom keluar">−</button>
+                                        <span id="tahriri-zoom-label" class="text-xs text-slate-400 w-10 text-center">28px</span>
+                                        <button type="button" onclick="zoomTahririText(2)" class="w-8 h-8 rounded-xl border border-white/15 text-sm hover:bg-white/10" title="Zoom masuk">+</button>
+                                        <button type="button" onclick="downloadTahririText()" class="ml-1 px-3 py-1.5 rounded-xl border border-emerald-500/40 text-[11px] text-emerald-300 hover:bg-emerald-900/30">
+                                            ⬇ Muat Turun
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="tahriri-arabic" class="text-right leading-[2.5] text-emerald-50 overflow-x-auto" dir="rtl" style="font-family: Amiri, 'Scheherazade New', 'Traditional Arabic', serif; font-size: 28px;"></div>
+                                <div id="tahriri-text-status" class="text-[10px] text-slate-500 mt-3"></div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 pt-1">
+                                <div>
+                                    <label class="text-xs text-slate-400">Skor (0–100)</label>
+                                    <input type="number" id="tahriri-score" min="0" max="100" value="80" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm mt-1">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400">Kesalahan</label>
+                                    <input type="number" id="tahriri-mistakes" min="0" value="2" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm mt-1">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Nota Guru / Sendiri</label>
+                                <textarea id="tahriri-notes" rows="2" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm mt-1" placeholder="Contoh: huruf ر kurang jelas..."></textarea>
+                            </div>
+                            <button onclick="logTahriri()" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm">Simpan Sesi Tracing</button>
+                            <button onclick="aiReviewTahriri()" class="w-full mt-2 py-3 rounded-2xl border border-amber-500/40 text-amber-300 text-sm hover:bg-amber-900/20">
+                                ✨ Semakan AI (berdasarkan skor)
+                            </button>
+                        </div>
+                        <div id="tahriri-ai-feedback" class="mt-3 text-xs text-slate-300 hidden"></div>
+                        <div id="tahriri-history" class="mt-5 space-y-2 text-sm"></div>
+                    </div>
+                </div>
+            </div>
 
-.nav-link.active {
-  background-color: rgba(5, 150, 105, 0.15);
-  color: var(--emerald-700);
-  font-weight: 600;
-}
+            <!-- SELAWAT (TERPISAH) -->
+            <div id="view-selawat" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 11</div>
+                    <div class="text-3xl font-semibold tracking-tight">Selawat</div>
+                </div>
+                
+                <div class="max-w-md mx-auto">
+                    <div class="glass rounded-3xl p-8 text-center border border-white/10">
+                        <div class="text-emerald-400 text-sm tracking-widest mb-2">اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ</div>
+                        <div id="selawat-counter" class="tasbih-counter my-6 text-amber-400 font-bold tabular-nums select-none cursor-pointer" onclick="incrementSelawat()">0</div>
+                        <div class="text-xs text-slate-400 mb-6">Tap nombor untuk kira • Target harian boleh diset</div>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="resetSelawat()" class="flex-1 py-3 rounded-2xl border border-white/20 text-sm">Reset</button>
+                            <button onclick="saveSelawatSession()" class="flex-1 py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-sm font-semibold text-white">Simpan Sesi</button>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-white/10">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <span>Target Harian</span>
+                                <span class="text-amber-400"><span id="selawat-daily">0</span> / <span id="selawat-target">100</span></span>
+                            </div>
+                            <div class="h-2.5 bg-white/10 rounded-full overflow-hidden">
+                                <div id="selawat-bar" class="h-2.5 bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-.dark .nav-link.active {
-  background-color: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-}
+            <!-- MUHASABAH JOURNAL -->
+            <div id="view-journal" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 20</div>
+                    <div class="text-3xl font-semibold tracking-tight">Muhasabah Journal</div>
+                </div>
+                
+                <div class="glass rounded-3xl p-7 border border-white/10 max-w-2xl">
+                    <div class="mb-5">
+                        <div class="text-xs uppercase tracking-widest text-emerald-400 mb-2">HOW WAS YOUR DAY?</div>
+                        <div class="flex gap-x-2" id="mood-selector">
+                            <!-- Mood buttons populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-5">
+                        <div>
+                            <label class="text-xs text-slate-400">What are you grateful for today?</label>
+                            <textarea id="journal-gratitude" rows="2" placeholder="Alhamdulillah for..." 
+                                      class="mt-1.5 w-full bg-slate-900 border border-white/10 focus:border-emerald-500/70 rounded-2xl px-4 py-3 text-sm"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="text-xs text-slate-400">Reflection &amp; Lessons</label>
+                            <textarea id="journal-reflection" rows="3" placeholder="Today I learned..." 
+                                      class="mt-1.5 w-full bg-slate-900 border border-white/10 focus:border-emerald-500/70 rounded-2xl px-4 py-3 text-sm"></textarea>
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveMuhasabahEntry()" 
+                            class="mt-6 w-full bg-white text-emerald-900 font-semibold py-4 rounded-2xl active:scale-[0.985] transition-all">Save Entry</button>
+                </div>
+                
+                <div class="mt-8">
+                    <div class="font-medium mb-3 px-1">Recent Reflections</div>
+                    <div id="journal-history" class="space-y-3 text-sm"></div>
+                </div>
+            </div>
 
-/* Modal */
-.modal {
-  animation: modalEnter 0.2s cubic-bezier(0.32, 0.72, 0, 1);
-}
+            <!-- GOALS MODULE -->
+            <div id="view-goals" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 17</div>
+                    <div class="text-3xl font-semibold tracking-tight">Islamic Goals 2026</div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="goals-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
 
-@keyframes modalEnter {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
+            <!-- STATS & REPORTS -->
+            <div id="view-stats" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 26 • 27</div>
+                    <div class="text-3xl font-semibold tracking-tight">Statistics &amp; Insights</div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass p-6 rounded-3xl border border-white/10">
+                        <div class="font-semibold mb-4">Weekly Ibadah Consistency</div>
+                        <canvas id="weekly-chart" height="110"></canvas>
+                    </div>
+                    <div class="glass p-6 rounded-3xl border border-white/10">
+                        <div class="font-semibold mb-4">Life Balance Radar</div>
+                        <canvas id="balance-chart" height="110"></canvas>
+                    </div>
+                </div>
+            </div>
 
-/* Beautiful Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.4);
-  border-radius: 20px;
-}
-.dark ::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.3);
-}
+            <!-- ACHIEVEMENTS -->
+            <div id="view-achievements" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 28</div>
+                    <div class="text-3xl font-semibold tracking-tight">Achievements &amp; Badges</div>
+                </div>
+                
+                <div class="mb-6 glass rounded-3xl p-5 border border-white/10 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs text-emerald-400 tracking-wider">CURRENT LEVEL</div>
+                        <div class="text-4xl font-semibold tabular-nums" id="ach-level">Level 1</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-emerald-400 tracking-wider">TOTAL XP</div>
+                        <div class="text-3xl font-semibold tabular-nums text-amber-400" id="ach-xp">0 XP</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="achievements-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
 
-/* Micro interactions */
-.btn-premium {
-  transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
+            <!-- SEDEKAH MODULE -->
+            <div id="view-sedekah" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 12</div>
+                    <div class="text-3xl font-semibold tracking-tight">Sedekah Tracker</div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div class="lg:col-span-3 glass rounded-3xl p-7 border border-white/10">
+                        <div class="font-semibold mb-5">Log Sedekah Baru</div>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5" id="sedekah-categories">
+                            <button onclick="selectSedekahCategory('money')" data-cat="money" class="sedekah-cat py-4 rounded-2xl border border-white/15 hover:border-emerald-500/50 active:scale-95 transition-all text-center">
+                                <div class="text-2xl mb-1">💰</div>
+                                <div class="text-xs font-medium">Wang</div>
+                            </button>
+                            <button onclick="selectSedekahCategory('food')" data-cat="food" class="sedekah-cat py-4 rounded-2xl border border-white/15 hover:border-emerald-500/50 active:scale-95 transition-all text-center">
+                                <div class="text-2xl mb-1">🍲</div>
+                                <div class="text-xs font-medium">Makanan</div>
+                            </button>
+                            <button onclick="selectSedekahCategory('goods')" data-cat="goods" class="sedekah-cat py-4 rounded-2xl border border-white/15 hover:border-emerald-500/50 active:scale-95 transition-all text-center">
+                                <div class="text-2xl mb-1">🎁</div>
+                                <div class="text-xs font-medium">Barangan</div>
+                            </button>
+                            <button onclick="selectSedekahCategory('volunteer')" data-cat="volunteer" class="sedekah-cat py-4 rounded-2xl border border-white/15 hover:border-emerald-500/50 active:scale-95 transition-all text-center">
+                                <div class="text-2xl mb-1">🤝</div>
+                                <div class="text-xs font-medium">Volunteer</div>
+                            </button>
+                            <button onclick="selectSedekahCategory('anonymous')" data-cat="anonymous" class="sedekah-cat py-4 rounded-2xl border border-white/15 hover:border-emerald-500/50 active:scale-95 transition-all text-center">
+                                <div class="text-2xl mb-1">🤫</div>
+                                <div class="text-xs font-medium">Anonymous</div>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1.5">Jumlah (RM) — optional</label>
+                                <input type="number" id="sedekah-amount" placeholder="0.00" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm focus:border-emerald-500/70">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1.5">Nota / Penerima</label>
+                                <input type="text" id="sedekah-note" placeholder="Contoh: Sedekah kepada anak yatim..." class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm focus:border-emerald-500/70">
+                            </div>
+                        </div>
+                        
+                        <button onclick="logSedekah()" class="mt-6 w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold active:scale-[0.985] transition-all">
+                            Rekod Sedekah
+                        </button>
+                    </div>
+                    
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="glass rounded-3xl p-6 border border-white/10 text-center">
+                            <div class="text-xs text-emerald-400 tracking-wider">BULAN INI</div>
+                            <div class="text-4xl font-semibold tabular-nums mt-1" id="sedekah-monthly">RM 0</div>
+                            <div class="text-xs text-slate-400 mt-1">Jumlah sedekah</div>
+                        </div>
+                        <div class="glass rounded-3xl p-6 border border-white/10">
+                            <div class="font-semibold mb-3 text-sm">Sejarah Terkini</div>
+                            <div id="sedekah-history" class="space-y-2 text-sm max-h-48 overflow-y-auto">
+                                <div class="text-xs text-slate-500 text-center py-4">Belum ada rekod</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-.btn-premium:active {
-  transform: scale(0.985);
-}
+            
+            <!-- AI IMAM -->
+            <div id="view-ai-imam" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 25</div>
+                    <div class="text-3xl font-semibold tracking-tight">AI Imam</div>
+                    <div class="text-sm text-slate-400 mt-1">Pembimbing digital untuk soalan harian & motivasi ibadah</div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass rounded-3xl p-6 border border-white/10 flex flex-col" style="min-height:420px">
+                        <div id="ai-chat" class="flex-1 overflow-y-auto space-y-3 mb-4 max-h-[360px] pr-1">
+                            <div class="text-sm text-slate-400 text-center py-6">Assalamualaikum. Tanya AI Imam tentang solat, quran, motivasi, atau tips ibadah.</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="ai-input" placeholder="Contoh: Tips bangkit untuk tahajjud..." class="flex-1 bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm" onkeydown="if(event.key==='Enter')askAIImam()">
+                            <button onclick="askAIImam()" class="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm">Hantar</button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <button onclick="quickAsk('tips solat subuh')" class="text-[11px] px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5">Tips Solat Subuh</button>
+                            <button onclick="quickAsk('motivasi khatam quran')" class="text-[11px] px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5">Motivasi Khatam</button>
+                            <button onclick="quickAsk('cara kurangkan was-was solat')" class="text-[11px] px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5">Was-was Solat</button>
+                            <button onclick="quickAsk('manfaat sedekah')" class="text-[11px] px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5">Manfaat Sedekah</button>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="glass rounded-3xl p-5 border border-white/10">
+                            <div class="font-semibold mb-2">Nasihat Hari Ini</div>
+                            <div id="ai-daily-tip" class="text-sm text-slate-300 leading-relaxed">—</div>
+                        </div>
+                        <div class="glass rounded-3xl p-5 border border-white/10">
+                            <div class="text-xs text-slate-500 mb-2">Nota</div>
+                            <div class="text-xs text-slate-400 leading-relaxed">AI Imam menggunakan panduan berasaskan ilmu asas Islam & tips praktikal. Bukan fatwa rasmi. Untuk isu hukum kompleks, rujuk ustaz / ulama yang dipercayai.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-.btn-premium::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -100%;
-  width: 50%;
-  height: 200%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,0.25),
-    transparent
-  );
-  transition: 0.5s;
-}
+            <!-- FAMILY MODE -->
+            
+            <!-- FAMILY REPORT -->
+            <div id="view-family-report" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">FAMILY REPORT</div>
+                    <div class="text-3xl font-semibold tracking-tight">Laporan Keluarga</div>
+                    <div class="text-sm text-slate-400 mt-1">Harian &amp; mingguan — monitor ibadah ahli</div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button type="button" onclick="setReportRange('daily')" id="btn-report-daily" class="px-4 py-2 rounded-2xl bg-emerald-600 text-sm font-medium">Hari Ini</button>
+                    <button type="button" onclick="setReportRange('weekly')" id="btn-report-weekly" class="px-4 py-2 rounded-2xl border border-white/15 text-sm">7 Hari</button>
+                    <button type="button" onclick="refreshFamilyReport()" class="px-4 py-2 rounded-2xl border border-white/15 text-sm">↻ Refresh</button>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="report-summary-cards">
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold text-emerald-400" id="rep-complete">0</div>
+                        <div class="text-[10px] text-slate-400">Lengkap 5 waktu</div>
+                    </div>
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold text-amber-400" id="rep-partial">0</div>
+                        <div class="text-[10px] text-slate-400">Sebahagian</div>
+                    </div>
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold text-red-400" id="rep-none">0</div>
+                        <div class="text-[10px] text-slate-400">Belum solat</div>
+                    </div>
+                    <div class="glass rounded-2xl p-4 text-center border border-white/10">
+                        <div class="text-2xl font-semibold" id="rep-pct">0%</div>
+                        <div class="text-[10px] text-slate-400">Purata keluarga</div>
+                    </div>
+                </div>
+                
+                <div class="glass rounded-3xl p-6 border border-white/10 mb-6">
+                    <div class="font-semibold mb-4" id="report-title">Laporan Hari Ini</div>
+                    <div id="family-report-table" class="space-y-3 text-sm"></div>
+                </div>
+                
+                <div class="glass rounded-3xl p-6 border border-white/10">
+                    <div class="font-semibold mb-3">Notifikasi</div>
+                    <p class="text-xs text-slate-400 mb-4">Ingatkan solat &amp; ringkasan keluarga (browser notification).</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="enableNotifications()" class="px-4 py-2.5 rounded-2xl bg-emerald-600 text-sm font-medium">Aktifkan Notifikasi</button>
+                        <button type="button" onclick="testNotification()" class="px-4 py-2.5 rounded-2xl border border-white/15 text-sm">Test Notifikasi</button>
+                    </div>
+                    <div id="notif-status" class="text-xs text-slate-500 mt-3">Status: belum diminta</div>
+                    <div class="mt-4 space-y-2 text-xs text-slate-400">
+                        <label class="flex items-center gap-2"><input type="checkbox" id="notif-prayer" checked class="rounded"> Peringatan waktu solat (bila app dibuka)</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" id="notif-family" checked class="rounded"> Ringkasan keluarga (pagi / petang)</label>
+                    </div>
+                </div>
+            </div>
 
-.btn-premium:hover::after {
-  left: 250%;
-}
+<div id="view-family" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 26</div>
+                    <div class="text-3xl font-semibold tracking-tight">Family Mode</div>
+                    <div class="text-sm text-slate-400 mt-1">Jejak ibadah bersama keluarga</div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div class="lg:col-span-2 glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4">Ahli Keluarga</div>
+                        <div class="space-y-3 mb-4">
+                            <input type="text" id="family-name" placeholder="Nama ahli" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                            <select id="family-role" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                                <option value="bapa">Bapa</option>
+                                <option value="ibu">Ibu</option>
+                                <option value="anak">Anak</option>
+                                <option value="datuk">Datuk / Nenek</option>
+                                <option value="lain">Lain-lain</option>
+                            </select>
+                            <button onclick="addFamilyMember()" class="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm">Tambah Ahli</button>
+                        </div>
+                        <div id="family-list" class="space-y-2"></div>
+                    </div>
+                    
+                    <div class="lg:col-span-3 space-y-4">
+                        <div class="glass rounded-3xl p-6 border border-white/10">
+                            <div class="font-semibold mb-3">Ibadah Keluarga Hari Ini</div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                                <div class="bg-white/5 rounded-2xl p-3">
+                                    <div class="text-2xl font-semibold text-emerald-400" id="fam-solat">0</div>
+                                    <div class="text-[10px] text-slate-400">Solat direkod</div>
+                                </div>
+                                <div class="bg-white/5 rounded-2xl p-3">
+                                    <div class="text-2xl font-semibold text-emerald-400" id="fam-quran">0</div>
+                                    <div class="text-[10px] text-slate-400">Bacaan Quran</div>
+                                </div>
+                                <div class="bg-white/5 rounded-2xl p-3">
+                                    <div class="text-2xl font-semibold text-emerald-400" id="fam-zikir">0</div>
+                                    <div class="text-[10px] text-slate-400">Zikir</div>
+                                </div>
+                                <div class="bg-white/5 rounded-2xl p-3">
+                                    <div class="text-2xl font-semibold text-emerald-400" id="fam-members">0</div>
+                                    <div class="text-[10px] text-slate-400">Ahli aktif</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass rounded-3xl p-6 border border-white/10">
+                            <div class="font-semibold mb-3">Matlamat Keluarga</div>
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" id="family-goal-input" placeholder="Contoh: Solat berjemaah Maghrib setiap hari" class="flex-1 bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
+                                <button onclick="addFamilyGoal()" class="px-4 py-2.5 rounded-2xl bg-emerald-600 text-sm font-medium">Tambah</button>
+                            </div>
+                            <div id="family-goals" class="space-y-2 text-sm"></div>
+                        </div>
+                        
+                        <div class="glass rounded-3xl p-5 border border-white/10 text-xs text-slate-400 space-y-2">
+                            <div><strong class="text-emerald-300">Mode Cloud (Supabase):</strong> Log masuk → Cipta / Join Family Code → setiap ahli tick solat sendiri → parent nampak semua.</div>
+                            <div><strong class="text-amber-300">Mode Offline:</strong> Tambah nama lokal di kiri (untuk 1 peranti sahaja).</div>
+                        </div>
+                        
+                        <!-- Cloud Family Panel -->
+                        <div class="glass rounded-3xl p-6 border border-emerald-500/20 mt-4" id="family-cloud-panel">
+                            <div class="font-semibold mb-3 text-emerald-300">Family Cloud (Sync)</div>
+                            <div id="auth-status" class="text-xs text-slate-400 mb-3">Belum log masuk</div>
+                            
+                            <div id="auth-forms" class="space-y-3 mb-4">
+                                <input type="text" id="auth-name" placeholder="Nama penuh" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
+                                <input type="email" id="auth-email" placeholder="Email" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
+                                <input type="password" id="auth-password" placeholder="Password (min 6)" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="mlosSignUp()" class="flex-1 py-2.5 rounded-2xl bg-emerald-600 text-sm font-medium">Daftar</button>
+                                    <button type="button" onclick="mlosSignIn()" class="flex-1 py-2.5 rounded-2xl border border-white/20 text-sm">Log Masuk</button>
+                                </div>
+                            </div>
+                            
+                            <div id="family-cloud-actions" class="hidden space-y-3">
+                                <div class="flex gap-2">
+                                    <input type="text" id="family-create-name" placeholder="Nama keluarga" class="flex-1 bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm">
+                                    <button type="button" onclick="mlosCreateFamily()" class="px-4 py-2.5 rounded-2xl bg-emerald-600 text-sm font-medium">Cipta</button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="family-join-code" placeholder="Kod: ML-XXXX" class="flex-1 bg-slate-900 border border-white/10 rounded-2xl px-4 py-2.5 text-sm uppercase">
+                                    <button type="button" onclick="mlosJoinFamily()" class="px-4 py-2.5 rounded-2xl border border-emerald-500/40 text-emerald-300 text-sm">Join</button>
+                                </div>
+                                <button type="button" onclick="mlosSignOut()" class="w-full py-2 rounded-2xl border border-white/10 text-xs text-slate-400">Log Keluar</button>
+                            </div>
+                            
+                            <div id="family-cloud-monitor" class="mt-4 space-y-2"></div>
+                            <div id="my-cloud-solat" class="mt-4 hidden">
+                                <div class="text-xs text-emerald-400 mb-2">Solat saya hari ini (sync)</div>
+                                <div class="flex flex-wrap gap-1.5" id="my-cloud-solat-btns"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-/* Module Header with Islamic flair */
-.module-header {
-  background: linear-gradient(90deg, var(--emerald-800), var(--emerald-900));
-  color: white;
-}
 
-.dark .module-header {
-  background: linear-gradient(90deg, #064e3b, #022c22);
-}
+            <!-- DOA & HADIS SAHIH -->
+            <div id="view-doa-hadis" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 15</div>
+                    <div class="text-3xl font-semibold tracking-tight">Doa &amp; Hadis Sahih</div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4 text-emerald-300">Doa Pilihan</div>
+                        <div id="doa-list" class="space-y-4 text-sm"></div>
+                    </div>
+                    <div class="glass rounded-3xl p-6 border border-white/10">
+                        <div class="font-semibold mb-4 text-amber-300">Hadis Sahih</div>
+                        <div id="hadis-list" class="space-y-4 text-sm"></div>
+                    </div>
+                </div>
+            </div>
 
-/* Stats Number Animation */
-.stat-number {
-  font-variant-numeric: tabular-nums;
-}
+            <!-- SUNNAH RASULULLAH -->
+            <div id="view-sunnah" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 16</div>
+                    <div class="text-3xl font-semibold tracking-tight">Sunnah Rasulullah ﷺ</div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="sunnah-grid"></div>
+            </div>
 
-/* Responsive adjustments for PWA */
-@media (max-width: 768px) {
-  .tasbih-counter {
-    font-size: 4rem;
-  }
-  
-  .premium-card {
-    border-radius: var(--radius-2xl);
-  }
-}
+            <!-- BACAAN LEPAS SOLAT -->
+            <div id="view-wirid" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 17</div>
+                    <div class="text-3xl font-semibold tracking-tight">Bacaan Lepas Solat</div>
+                    <div class="text-sm text-slate-400 mt-1">Wirid &amp; zikir selepas solat fardhu</div>
+                </div>
+                <div class="glass rounded-3xl p-6 border border-white/10 max-w-3xl mx-auto">
+                    <div id="wirid-list" class="space-y-5"></div>
+                    <div class="mt-6 flex gap-3">
+                        <button onclick="markWiridDone()" class="flex-1 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm">✓ Saya sudah baca hari ini</button>
+                    </div>
+                    <div class="text-center text-xs text-slate-500 mt-3">Streak wirid: <span id="wirid-streak" class="text-emerald-400 font-semibold">0</span> hari</div>
+                </div>
+            </div>
 
-/* Print styles for reports */
-@media print {
-  .no-print { display: none !important; }
-  .glass { background: white; box-shadow: none; border: 1px solid #ddd; }
-}
-/* ========== v1.1 Extra Polish ========== */
-.animate-fade-in {
-  animation: fadeInUp 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-}
+<!-- SETTINGS -->
+            <div id="view-settings" class="section">
+                <div class="module-header rounded-3xl px-8 py-5 mb-6">
+                    <div class="text-emerald-300 text-xs tracking-[2px]">MODULE 29</div>
+                    <div class="text-3xl font-semibold tracking-tight">Settings &amp; Preferences</div>
+                </div>
+                
+                <div class="max-w-lg space-y-4">
+                    <div class="glass rounded-3xl p-5 border border-white/10 flex justify-between items-center">
+                        <div>Dark Mode</div>
+                        <button onclick="toggleTheme()" class="px-4 py-1.5 text-xs rounded-2xl border border-white/20">Toggle</button>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-5 border border-white/10">
+                        <div class="mb-2 text-sm">Language</div>
+                        <div class="flex gap-x-2">
+                            <div class="px-4 py-1 bg-emerald-600 text-white text-sm rounded-2xl">Bahasa Melayu</div>
+                            <div class="px-4 py-1 border border-white/20 text-sm rounded-2xl opacity-60">English (soon)</div>
+                        </div>
+                    </div>
+                    
+                    <div onclick="syncWithSupabase()" class="glass cursor-pointer rounded-3xl p-5 border border-white/10 flex justify-between items-center hover:border-emerald-500/40 transition-colors">
+                        <div>
+                            <div>Sync with Supabase</div>
+                            <div class="text-xs text-emerald-400">Last synced: Today, 4:12 PM</div>
+                        </div>
+                        <div class="text-emerald-400">↻</div>
+                    </div>
+                    
+                    <button onclick="exportData()" class="w-full py-4 text-sm rounded-2xl border border-white/20 hover:bg-white/5">Export Data (JSON / CSV)</button>
+                    
+                    <button onclick="celebrateDemo()" class="w-full py-4 text-sm rounded-2xl bg-amber-600/20 border border-amber-500/30 text-amber-300 hover:bg-amber-600/30">
+                        🎉 Test Confetti Celebration
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
 
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0);
-}
+    <!-- Bottom Mobile Navigation -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 border-t border-white/10 bg-slate-900/95 backdrop-blur-xl z-50 pb-safe">
+        <div class="flex justify-around py-2.5 text-xs">
+            <button onclick="showModule('dashboard')" class="mobile-nav-btn flex flex-col items-center px-3 py-1 text-emerald-400">
+                <i data-lucide="home" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">Home</span>
+            </button>
+            <button onclick="showModule('solat')" class="mobile-nav-btn flex flex-col items-center px-3 py-1 text-slate-400">
+                <i data-lucide="clock" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">Solat</span>
+            </button>
+            <button onclick="showModule('zikir')" class="mobile-nav-btn flex flex-col items-center px-3 py-1 text-slate-400">
+                <i data-lucide="sparkles" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">Zikir</span>
+            </button>
+            <button onclick="showModule('sedekah')" class="mobile-nav-btn flex flex-col items-center px-3 py-1 text-slate-400">
+                <i data-lucide="heart-handshake" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">Sedekah</span>
+            </button>
+            <button onclick="showModule('achievements')" class="mobile-nav-btn flex flex-col items-center px-3 py-1 text-slate-400">
+                <i data-lucide="trophy" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[10px]">Badges</span>
+            </button>
+        </div>
+    </div>
 
-.mobile-nav-btn {
-  transition: color 0.2s ease;
-}
+    <!-- Profile Modal -->
+    <div id="profile-modal" onclick="if (event.target.id === 'profile-modal') hideProfileModal()" class="hidden fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="glass w-full max-w-md rounded-3xl p-7 border border-white/10">
+            <div class="flex justify-between mb-6">
+                <div class="font-semibold text-xl">Profile &amp; Settings</div>
+                <button onclick="hideProfileModal()" class="text-xl leading-none">×</button>
+            </div>
+            
+            <div class="space-y-5 text-sm">
+                <div>
+                    <label class="text-xs block mb-1 text-emerald-400">FULL NAME</label>
+                    <input id="profile-fullname" value="" class="w-full bg-slate-900 border border-white/10 px-4 py-3 rounded-2xl">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs block mb-1 text-emerald-400">LOCATION</label>
+                        <div class="px-4 py-3 bg-slate-900 border border-white/10 rounded-2xl"></div>
+                    </div>
+                    <div>
+                        <label class="text-xs block mb-1 text-emerald-400">TIMEZONE</label>
+                        <div class="px-4 py-3 bg-slate-900 border border-white/10 rounded-2xl">Asia/Kuala_Lumpur</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex gap-x-3">
+                <button onclick="saveProfile()" class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold rounded-2xl">Save Changes</button>
+                <button onclick="hideProfileModal()" class="flex-1 py-3.5 border border-white/20 hover:bg-white/5 text-sm font-medium rounded-2xl">Cancel</button>
+            </div>
+            
+            <div class="text-center mt-6">
+                <button onclick="mlosProfileSignOut()" class="text-xs text-red-400 hover:text-red-300">Log Keluar</button>
+            </div>
+        </div>
+    </div>
 
-.sedekah-cat:active {
-  border-color: rgba(16, 185, 129, 0.5);
-  background: rgba(6, 95, 70, 0.2);
-}
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-20 lg:bottom-6 right-6 z-[70] space-y-2"></div>
 
-.tasbih-counter {
-  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+        // Tailwind script configuration
+        function initializeTailwind() {
+            document.documentElement.classList.add('dark');
+            
+            // Optional: dynamic tailwind config if needed
+        }
+        
+        // Boot the application
+        window.onload = function() {
+            initializeTailwind();
+            
+            // Initialize core app (defined in app.js)
+            if (typeof initializeApp === 'function') {
+                initializeApp();
+            } else {
+                console.error('app.js failed to load properly');
+            }
+            
+            // Ensure Lucide icons are rendered
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('%c[SW] Muslim Life OS Service Worker registered.', 'color:#166534'))
+                    .catch(err => console.warn('SW registration failed (offline mode still works):', err));
+            }
+            
+            // PWA install prompt handling (basic)
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+            });
+        }
+    </script>
 
-.grayscale {
-  filter: grayscale(1);
-  opacity: 0.7;
-}
+    <!-- LOGIN GATE — wajib login -->
+    <div id="login-gate" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-6">
+        <div class="w-full max-w-md glass rounded-3xl p-8 border border-emerald-500/20 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="text-emerald-400 text-xs tracking-[3px] mb-2">MUSLIM LIFE OS</div>
+                <div class="text-2xl font-semibold">Log Masuk / Daftar</div>
+                <p class="text-xs text-slate-400 mt-2">Wajib log masuk untuk guna app</p>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="gate-name" placeholder="Nama penuh" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                <input type="email" id="gate-email" placeholder="Email" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                <input type="password" id="gate-password" placeholder="Password (min 6)" class="w-full bg-slate-900 border border-white/10 rounded-2xl px-4 py-3 text-sm">
+                <div class="flex gap-2 pt-1">
+                    <button type="button" onclick="gateSignUp()" class="flex-1 py-3 rounded-2xl bg-emerald-600 text-sm font-semibold">Daftar</button>
+                    <button type="button" onclick="gateSignIn()" class="flex-1 py-3 rounded-2xl border border-white/20 text-sm">Log Masuk</button>
+                </div>
+                <p id="gate-msg" class="text-xs text-center text-slate-500 min-h-[1.25rem]"></p>
+            </div>
+        </div>
+    </div>
 
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 2px solid #10b981;
-  outline-offset: 2px;
-}
+</body>
+</html>
